@@ -1,0 +1,1521 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+
+/* =====================================================
+   GLOBAL RESET
+===================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+html,
+body,
+#root {
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    background: linear-gradient(
+        135deg,
+        #0F172A,
+        #111827,
+        #1E293B
+    );
+
+    min-height: 100vh;
+    color: white;
+
+    /* IMPORTANT:
+       Don't use flex here.
+       It was causing the overall layout to behave badly.
+    */
+    display: block;
+
+    overflow-x: hidden;
+}
+
+
+/* =====================================================
+   MAIN CONTAINER
+===================================================== */
+
+.container {
+    width: min(94%, 900px);
+    margin: 2px auto 5px;
+    padding: 2px 10px 10px 10px;
+
+    box-sizing: border-box;
+    backdrop-filter: blur(40px);
+
+    box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.45);
+}
+
+
+/* =====================================================
+   OLD CRM SUBTITLE
+===================================================== */
+
+.crm-subtitle {
+    text-align: left;
+    color: #bfbfbf;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+
+/* =====================================================
+   FORM
+===================================================== */
+
+form {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px;
+}
+
+
+/* Customer Name */
+
+input[name="customer_name"] {
+    grid-column: span 3;
+}
+
+
+/* Contact Number */
+
+input[name="contact_no"] {
+    grid-column: span 3;
+}
+
+
+/* Email / Location / Status */
+
+.one-third {
+    grid-column: span 2;
+}
+
+
+/* =====================================================
+   REMARKS
+===================================================== */
+
+.remarks-box {
+    grid-column: span 6;
+
+    width: 100%;
+
+    min-height: 80px;
+    height: 80px;
+
+    resize: vertical;
+}
+
+
+/* =====================================================
+   INPUTS / SELECT / TEXTAREA
+===================================================== */
+
+input,
+select,
+textarea {
+    width: 100%;
+
+    padding: 13px 15px;
+
+    border-radius: 12px;
+
+    border: 1px solid #374151;
+
+    background: #111827;
+
+    color: white;
+
+    font-size: 14px;
+
+    transition: 0.3s;
+
+    box-sizing: border-box;
+}
+
+
+input::placeholder,
+textarea::placeholder {
+    color: #8f8f8f;
+}
+
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+
+    border-color: #C8A96A;
+
+    box-shadow:
+        0 0 15px rgba(200, 169, 106, 0.25);
+}
+
+
+/* =====================================================
+   SAVE BUTTON
+===================================================== */
+
+.save-btn {
+    grid-column: 1 / -1;
+
+    width: calc(100% - 20px);
+
+    margin: 0 10px;
+
+    padding: 13px;
+
+    background: linear-gradient(
+        90deg,
+        #0F766E,
+        #15803D
+    );
+
+    color: white;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    border: none;
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.save-btn:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+
+/* =========================
+   NAVBAR
+========================= */
+
+nav {
+    width: 100%;
+    height: 64px;
+    padding: 0 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    background: rgba(17, 24, 39, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+    backdrop-filter: blur(20px);
+
+    position: sticky;
+    top: 0;
+    z-index: 999;
+
+    /* VERY IMPORTANT */
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+
+/* =========================
+   LOGO
+========================= */
+
+.logo {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    width: 180px;
+    height: 55px;
+
+    object-fit: contain;
+    display: block;
+}
+
+
+/* =========================
+   SEARCH BOX
+========================= */
+
+.search-box {
+    flex: 1 1 280px;
+
+    width: 280px;
+    max-width: 450px;
+    min-width: 180px;
+
+    height: 40px;
+
+    padding: 8px 14px;
+
+    border: 1px solid #f5c542;
+    box-shadow: 0 0 6px rgba(245, 197, 66, 0.35);
+    border-radius: 25px;
+
+    background: #111827;
+    color: white;
+
+    font-size: 14px;
+
+    box-sizing: border-box;
+}
+
+.search-box::placeholder {
+    color: #9ca3af;
+}
+
+.search-box:focus {
+    outline: none;
+
+    box-shadow:
+        0 0 0 2px rgba(200, 169, 106, 0.15);
+}
+
+
+/* =========================
+   HOME / LEADS
+========================= */
+
+.nav-links {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+
+    gap: 18px;
+
+    list-style: none;
+
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li {
+    color: #ddd;
+
+    font-size: 15px;
+    font-weight: 400;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition: 0.25s;
+}
+
+.nav-links li:hover {
+    color: #c8a96a;
+}
+
+
+/* =========================
+   USER MENU
+========================= */
+
+.user-menu {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+}
+
+
+/* =========================
+   USER / LOGIN BUTTON
+========================= */
+
+.login-btn {
+    height: 40px;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 25px;
+    background: #0f766e;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: 0.25s;
+}
+
+.login-btn:hover {
+    background: #15803d;
+}
+
+
+/* =========================
+   DROPDOWN
+========================= */
+
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 130px;
+    padding: 6px;
+    background: #1b2638;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.35);
+    z-index: 1000;
+}
+
+.user-dropdown button {
+    width: 100%;
+    padding: 9px 12px;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: white;
+    text-align: left;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.user-dropdown button:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+
+/* =========================
+   LAPTOP
+========================= */
+
+@media (max-width: 1000px) {
+
+    nav {
+        padding: 0 14px;
+        gap: 12px;
+    }
+
+    .logo img {
+        width: 105px;
+    }
+
+    .search-box {
+        flex: 1 1 220px;
+        min-width: 150px;
+        max-width: 280px;
+    }
+
+    .nav-links {
+        gap: 12px;
+    }
+
+    .nav-links li {
+        font-size: 14px;
+    }
+
+    .login-btn {
+        padding: 8px 14px;
+    }
+}
+
+
+/* =========================
+   SMALL SCREEN
+========================= */
+
+@media (max-width: 700px) {
+
+    nav {
+        height: 58px;
+        padding: 0 8px;
+        gap: 8px;
+    }
+
+    .logo img {
+        width: 85px;
+        height: 45px;
+    }
+
+    .search-box {
+        flex: 1 1 auto;
+        min-width: 90px;
+        max-width: none;
+        height: 36px;
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    .nav-links {
+        gap: 7px;
+    }
+
+    .nav-links li {
+        font-size: 12px;
+    }
+
+    .login-btn {
+        height: 36px;
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}
+
+/* =====================================================
+   SOFT NOTIFICATION
+===================================================== */
+
+.soft-notification {
+    position: fixed;
+
+    right: 28px;
+    bottom: 28px;
+
+    z-index: 999999;
+
+    min-width: 280px;
+    max-width: 360px;
+
+    padding: 15px 20px;
+
+    background: rgba(24, 30, 42, 0.96);
+
+    color: #f5f5f5;
+
+    border:
+        1px solid rgba(200, 169, 106, 0.35);
+
+    border-left:
+        3px solid #c8a96a;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.35),
+        0 0 20px rgba(200, 169, 106, 0.08);
+
+    backdrop-filter: blur(12px);
+
+    animation:
+        notificationIn 0.35s ease forwards;
+}
+
+
+@keyframes notificationIn {
+
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+/* =====================================================
+   AUTH OVERLAY
+===================================================== */
+
+.auth-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(5, 10, 18, 0.78);
+
+    backdrop-filter: blur(8px);
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    z-index: 99999;
+}
+
+
+/* =====================================================
+   AUTH CARD
+===================================================== */
+
+.auth-card {
+    position: relative;
+
+    width: 420px;
+
+    max-width: calc(100% - 30px);
+
+    padding: 40px;
+
+    background: #111827;
+
+    border:
+        1px solid rgba(200, 169, 106, 0.25);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.55),
+        0 0 30px rgba(200, 169, 106, 0.06);
+
+    color: white;
+}
+
+
+/* =====================================================
+   AUTH CLOSE
+===================================================== */
+
+.auth-close {
+    position: absolute;
+
+    top: 15px;
+    right: 18px;
+
+    background: transparent;
+
+    border: none;
+
+    color: #aaa;
+
+    font-size: 28px;
+
+    cursor: pointer;
+
+    padding: 0;
+
+    width: auto;
+
+    margin: 0;
+}
+
+.auth-close:hover {
+    color: #c8a96a;
+
+    transform: none;
+
+    box-shadow: none;
+}
+
+
+/* =====================================================
+   AUTH TITLE
+===================================================== */
+
+.auth-card h2 {
+    margin: 0;
+
+    font-size: 28px;
+
+    color: #ffffff;
+}
+
+.auth-subtitle {
+    margin: 8px 0 28px;
+
+    color: #9ca3af;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   AUTH FORM
+===================================================== */
+
+.auth-card form {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 15px;
+}
+
+
+/* =====================================================
+   AUTH INPUTS
+===================================================== */
+
+.auth-card input {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 14px 16px;
+
+    background: #1b2433;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.08);
+
+    border-radius: 9px;
+
+    color: white;
+
+    font-size: 14px;
+
+    outline: none;
+}
+
+.auth-card input::placeholder {
+    color: #7f8998;
+}
+
+.auth-card input:focus {
+    border-color:
+        rgba(200, 169, 106, 0.65);
+
+    box-shadow:
+        0 0 0 3px rgba(200, 169, 106, 0.08);
+}
+
+
+/* =====================================================
+   AUTH SUBMIT
+===================================================== */
+
+.auth-submit {
+    width: 100%;
+
+    padding: 14px;
+
+    margin-top: 5px;
+
+    background: #c8a96a;
+
+    color: #111827;
+
+    border: none;
+
+    border-radius: 9px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.25s;
+}
+
+.auth-submit:hover {
+    background: #d8bc82;
+
+    transform: translateY(-1px);
+}
+
+
+/* =====================================================
+   AUTH MESSAGES
+===================================================== */
+
+.auth-success {
+    margin-top: 18px;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(34, 197, 94, 0.08);
+
+    border:
+        1px solid rgba(34, 197, 94, 0.2);
+
+    color: #86efac;
+
+    font-size: 13px;
+}
+
+.auth-error {
+    margin-top: 18px;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(239, 68, 68, 0.08);
+
+    border:
+        1px solid rgba(239, 68, 68, 0.2);
+
+    color: #fca5a5;
+
+    font-size: 13px;
+}
+
+
+/* =====================================================
+   AUTH SWITCH
+===================================================== */
+
+.auth-switch {
+    margin-top: 25px;
+
+    text-align: center;
+
+    color: #9ca3af;
+
+    font-size: 14px;
+}
+
+.auth-switch button {
+    width: auto;
+
+    padding: 0;
+
+    margin: 0;
+
+    background: none;
+
+    border: none;
+
+    color: #c8a96a;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    font-size: 14px;
+
+    display: inline;
+}
+
+.auth-switch button:hover {
+    text-decoration: underline;
+
+    transform: none;
+
+    box-shadow: none;
+}
+
+
+/* =====================================================
+   AGENT DASHBOARD
+===================================================== */
+
+.agent-dashboard {
+    width: 100%;
+
+    margin: 0;
+
+    padding: 0;
+
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   AGENT GREETING
+===================================================== */
+
+.agent-welcome {
+    width: 100%;
+
+    margin: 0 0 10px;
+
+    padding: 0;
+}
+
+.agent-welcome h1 {
+    margin: 0;
+
+    font-size: 20px;
+
+    font-weight: 600;
+
+    line-height: 1.25;
+
+    letter-spacing: -0.3px;
+}
+
+.agent-welcome p {
+    margin: 4px 0 0;
+
+    font-size: 12px;
+
+    line-height: 1.4;
+
+    opacity: 0.65;
+}
+
+
+/* =====================================================
+   STATS
+===================================================== */
+
+.agent-dashboard .stats {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 8px;
+
+    margin: 0 0 15px;
+
+    padding: 0;
+
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   STAT CARD
+===================================================== */
+
+.agent-dashboard .stat-card {
+    min-width: 0;
+
+    height: 68px;
+
+    padding: 8px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    border-radius: 10px;
+}
+
+
+/* Number */
+
+.agent-dashboard .stat-card h3 {
+    margin: 0 0 3px;
+
+    font-size: 22px;
+
+    font-weight: 600;
+
+    line-height: 1;
+}
+
+
+/* Label */
+
+.agent-dashboard .stat-card p {
+    margin: 0;
+
+    font-size: 10px;
+
+    font-weight: 500;
+
+    line-height: 1.2;
+
+    text-align: center;
+
+    white-space: nowrap;
+}
+
+
+
+/* =========================================
+   LEADS PAGE
+========================================= */
+
+.leads-page {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+/* Header */
+
+.leads-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+}
+
+.leads-header h1 {
+    margin: 0;
+
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.leads-header p {
+    margin: 5px 0 0;
+
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.leads-count {
+    padding: 8px 14px;
+
+    background: rgba(200, 169, 106, 0.12);
+
+    border: 1px solid rgba(200, 169, 106, 0.25);
+
+    border-radius: 20px;
+
+    color: #c8a96a;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   TABLE
+========================================= */
+
+.leads-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+
+    border-radius: 12px;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    background: rgba(17, 24, 39, 0.75);
+}
+
+.leads-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 850px;
+}
+
+
+/* Table Header */
+
+.leads-table th {
+    padding: 13px 12px;
+
+    text-align: left;
+
+    background: rgba(255, 255, 255, 0.04);
+
+    color: #c8a96a;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+/* Table Body */
+
+.leads-table td {
+    padding: 12px;
+
+    color: #d1d5db;
+
+    font-size: 12px;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.05);
+
+    vertical-align: middle;
+}
+
+
+/* Hover */
+
+.leads-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.025);
+}
+
+
+/* Customer */
+
+.customer-name {
+    color: white !important;
+
+    font-weight: 600;
+}
+
+
+/* Status */
+
+.lead-status {
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    background: rgba(34, 197, 94, 0.1);
+
+    border:
+        1px solid rgba(34, 197, 94, 0.2);
+
+    color: #86efac;
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+/* =========================================
+   REMARKS
+========================================= */
+
+.remarks-cell {
+    min-width: 220px;
+
+    max-width: 300px;
+}
+
+.remarks-display {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+}
+
+.remarks-display span {
+    flex: 1;
+
+    line-height: 1.4;
+
+    word-break: break-word;
+}
+
+
+/* Edit button */
+
+.edit-remarks-btn {
+    flex: 0 0 auto;
+
+    width: 30px;
+    height: 30px;
+
+    padding: 0;
+
+    margin: 0;
+
+    border: 1px solid rgba(200, 169, 106, 0.25);
+
+    border-radius: 7px;
+
+    background: rgba(200, 169, 106, 0.08);
+
+    color: #c8a96a;
+
+    cursor: pointer;
+
+    font-size: 13px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-remarks-btn:hover {
+    background: rgba(200, 169, 106, 0.18);
+
+    transform: none;
+
+    box-shadow: none;
+}
+
+
+/* =========================================
+   REMARKS EDIT MODE
+========================================= */
+
+.remarks-edit {
+    min-width: 220px;
+}
+
+.remarks-edit textarea {
+    width: 100%;
+
+    min-height: 65px;
+
+    padding: 9px;
+
+    resize: vertical;
+
+    border-radius: 7px;
+
+    background: #111827;
+
+    border:
+        1px solid rgba(200, 169, 106, 0.35);
+
+    color: white;
+
+    font-size: 12px;
+}
+
+.remarks-edit textarea:focus {
+    outline: none;
+
+    border-color: #c8a96a;
+}
+
+
+/* Buttons */
+
+.remarks-actions {
+    display: flex;
+
+    gap: 6px;
+
+    margin-top: 6px;
+}
+
+.remarks-actions button {
+    width: auto;
+
+    padding: 6px 10px;
+
+    margin: 0;
+
+    border-radius: 6px;
+
+    font-size: 11px;
+
+    cursor: pointer;
+
+    grid-column: auto;
+}
+
+
+.remarks-save {
+    background: #0f766e;
+
+    color: white;
+
+    border: none;
+}
+
+.remarks-save:hover {
+    background: #15803d;
+
+    transform: none;
+
+    box-shadow: none;
+}
+
+
+.remarks-cancel {
+    background: transparent;
+
+    color: #aaa;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.1);
+}
+
+.remarks-cancel:hover {
+    background: rgba(255, 255, 255, 0.05);
+
+    transform: none;
+
+    box-shadow: none;
+}
+
+
+/* =========================================
+   LOADING / EMPTY / ERROR
+========================================= */
+
+.leads-message,
+.leads-empty,
+.leads-error {
+    width: 100%;
+
+    padding: 40px 20px;
+
+    text-align: center;
+
+    border-radius: 12px;
+
+    background: rgba(17, 24, 39, 0.7);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.07);
+}
+
+.leads-message {
+    color: #9ca3af;
+}
+
+.leads-empty h3 {
+    margin: 0;
+
+    color: white;
+
+    font-size: 16px;
+}
+
+.leads-empty p {
+    margin-top: 6px;
+
+    color: #9ca3af;
+
+    font-size: 13px;
+}
+
+.leads-error {
+    color: #fca5a5;
+
+    border-color:
+        rgba(239, 68, 68, 0.2);
+
+    background:
+        rgba(239, 68, 68, 0.05);
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 650px) {
+
+    .leads-header {
+        align-items: flex-start;
+
+        gap: 10px;
+    }
+
+    .leads-header h1 {
+        font-size: 20px;
+    }
+
+    .leads-header p {
+        font-size: 11px;
+    }
+
+    .leads-count {
+        padding: 6px 10px;
+
+        font-size: 11px;
+    }
+
+}
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 900px) {
+
+    .container {
+        width: 94%;
+
+        padding: 15px;
+    }
+
+    .navbar {
+        padding: 0 15px;
+    }
+
+    .search-box {
+        width: 180px;
+    }
+
+    .nav-right {
+        gap: 9px;
+    }
+
+    .agent-dashboard .stats {
+        gap: 6px;
+    }
+
+    .agent-dashboard .stat-card {
+        height: 65px;
+    }
+
+    .agent-dashboard .stat-card h3 {
+        font-size: 20px;
+    }
+
+    .agent-dashboard .stat-card p {
+        font-size: 9px;
+    }
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 650px) {
+
+    .navbar {
+        height: 62px;
+
+        padding: 0 10px;
+
+        flex-wrap: nowrap;
+    }
+
+    .logo img {
+        width: 90px;
+
+        height: 48px;
+    }
+
+    .search-box {
+        display: none;
+    }
+
+    .nav-right {
+        gap: 7px;
+
+        flex-wrap: nowrap;
+    }
+
+    .nav-links {
+        gap: 7px;
+    }
+
+    .nav-links li {
+        font-size: 12px;
+    }
+
+    .login-btn {
+        padding: 8px 11px;
+
+        font-size: 12px;
+    }
+
+
+    .container {
+        width: 96%;
+
+        margin-top: 5px;
+
+        padding: 12px;
+    }
+
+
+    .agent-welcome h1 {
+        font-size: 18px;
+    }
+
+
+    .agent-dashboard .stats {
+        grid-template-columns:
+            repeat(2, 1fr);
+
+        gap: 8px;
+    }
+
+
+    .agent-dashboard .stat-card {
+        height: 65px;
+    }
+
+
+    form {
+        grid-template-columns: repeat(2, 1fr);
+
+        gap: 10px;
+    }
+
+
+    input[name="customer_name"],
+    input[name="contact_no"],
+    .one-third,
+    .remarks-box {
+        grid-column: span 2;
+    }
+
+
+    .remarks-box {
+        height: 75px;
+
+        min-height: 75px;
+    }
+
+
+    .save-btn {
+        grid-column: span 2;
+
+        width: calc(100% - 10px);
+
+        margin: 0 5px;
+    }
+}
+
+
+/* =====================================================
+   VERY SMALL MOBILE
+===================================================== */
+
+@media (max-width: 400px) {
+
+    .logo img {
+        width: 82px;
+    }
+
+    .nav-links li {
+        font-size: 11px;
+    }
+
+    .login-btn {
+        padding: 7px 9px;
+
+        font-size: 11px;
+    }
+
+    .agent-dashboard .stats {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+}
+
+
+/* =====================================================
+   AUTH MOBILE
+===================================================== */
+
+@media (max-width: 500px) {
+
+    .auth-card {
+        padding: 30px 22px;
+    }
+
+    .auth-card h2 {
+        font-size: 24px;
+    }
+}
