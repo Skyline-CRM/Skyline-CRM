@@ -8,7 +8,7 @@ function Navbar({ userName, onLogout, onLeads, onHome }) {
     <nav>
 
       <div className="logo">
-        <img src="/logo.png" alt="Logo" />
+        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Logo" />
       </div>
 
         <input

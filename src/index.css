@@ -1194,63 +1194,1697 @@ nav {
 
 .remarks-actions {
     display: flex;
-
     gap: 6px;
-
     margin-top: 6px;
 }
 
 .remarks-actions button {
     width: auto;
-
     padding: 6px 10px;
-
     margin: 0;
-
     border-radius: 6px;
-
     font-size: 11px;
-
     cursor: pointer;
-
     grid-column: auto;
 }
 
 
 .remarks-save {
     background: #0f766e;
-
     color: white;
-
     border: none;
 }
 
 .remarks-save:hover {
     background: #15803d;
-
     transform: none;
-
     box-shadow: none;
 }
 
 
 .remarks-cancel {
     background: transparent;
-
     color: #aaa;
-
     border:
         1px solid rgba(255, 255, 255, 0.1);
 }
 
 .remarks-cancel:hover {
     background: rgba(255, 255, 255, 0.05);
-
     transform: none;
-
     box-shadow: none;
 }
 
+
+/* =========================================
+   ONE CALL AT A TIME
+========================================= */
+
+.agent-call-card {
+    width: 100%;
+    max-width: 900px;
+    margin: 10px auto 0;
+    padding: 24px;
+    background: rgba(17, 24, 39, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.30);
+    animation: callAppear 0.35s ease;
+}
+
+@keyframes callAppear {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* CALL NUMBER */
+
+.call-number {
+    display: inline-block;
+    margin-bottom: 14px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: rgba(200, 169, 106, 0.12);
+    border: 1px solid rgba(200, 169, 106, 0.25);
+    color: #c8a96a;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+/* CUSTOMER */
+
+.agent-call-card .lead-info h2 {
+    margin: 0 0 12px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.agent-call-card .lead-info p {
+    margin: 6px 0;
+    color: #b8c0cc;
+    font-size: 14px;
+}
+
+
+/* STATUS */
+
+.agent-call-card .lead-action {
+    margin-top: 22px;
+}
+
+.agent-call-card .lead-action label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.agent-call-card .lead-action select {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #111827;
+    border: 1px solid #374151;
+    color: white;
+    cursor: pointer;
+}
+
+.agent-call-card .lead-action select:focus {
+    border-color: #c8a96a;
+    outline: none;
+}
+
+
+/* =========================================
+   INTERESTED PANEL
+========================================= */
+
+.interested-panel {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(200, 169, 106, 0.13),
+            rgba(15, 118, 110, 0.12)
+        );
+
+    border: 1px solid rgba(200, 169, 106, 0.35);
+
+    box-shadow:
+        0 0 25px rgba(200, 169, 106, 0.08);
+
+    animation: interestedAppear 0.45s ease;
+}
+
+@keyframes interestedAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+        max-height: 0;
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 500px;
+    }
+}
+
+
+/* INTERESTED TITLE */
+
+.interested-title {
+    margin-bottom: 16px;
+    color: #c8a96a;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+
+/* FIELDS */
+
+.interested-fields {
+    display: grid;
+    grid-template-columns:
+        repeat(3, 1fr);
+    gap: 12px;
+}
+
+.interested-fields label {
+    display: block;
+    margin-bottom: 6px;
+    color: #aeb6c3;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.interested-fields input {
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: 9px;
+    background: #111827;
+    border: 1px solid #374151;
+    color: white;
+    font-size: 13px;
+}
+
+.interested-fields input:focus {
+    outline: none;
+    border-color: #c8a96a;
+    box-shadow:
+        0 0 0 3px
+        rgba(200, 169, 106, 0.08);
+}
+
+
+/* =========================================
+   SAVE & NEXT BUTTON
+========================================= */
+
+.save-interested-btn {
+    grid-column: 1 / -1;
+
+    width: 100%;
+    margin-top: 5px;
+
+    padding: 13px 20px;
+
+    border: none;
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #c8a96a,
+            #e1c47b
+        );
+
+    color: #111827;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 20px
+        rgba(200, 169, 106, 0.18);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        filter 0.25s ease;
+}
+
+.save-interested-btn:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 12px 28px
+        rgba(200, 169, 106, 0.32);
+
+    filter: brightness(1.08);
+}
+
+.save-interested-btn:active {
+    transform: translateY(1px);
+}
+
+.save-interested-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* =========================================
+   ALL CALLS COMPLETED
+========================================= */
+
+.no-leads {
+    width: 100%;
+    padding: 45px 20px;
+    text-align: center;
+
+    border-radius: 16px;
+
+    background: rgba(17, 24, 39, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+
+    color: #9ca3af;
+    font-size: 15px;
+}
+
+/* =========================================================
+   MANAGER DASHBOARD
+========================================================= */
+
+.manager-dashboard {
+  min-height: 100vh;
+  display: flex;
+  background: #f5f7fb;
+  color: #111827;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.manager-sidebar {
+  width: 250px;
+  min-height: 100vh;
+
+  background: #0b1220;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 24px 16px;
+
+  box-sizing: border-box;
+}
+
+
+/* BRAND */
+
+.manager-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 4px 8px 22px;
+}
+
+.manager-logo {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 12px;
+
+  background: linear-gradient(
+    135deg,
+    #facc15,
+    #f59e0b
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 800;
+  color: #111827;
+
+  font-size: 15px;
+}
+
+.manager-brand h2 {
+  margin: 0;
+
+  color: white;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.manager-brand span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+}
+
+
+/* DIVIDER */
+
+.sidebar-divider {
+  height: 1px;
+
+  background: rgba(255,255,255,0.08);
+
+  margin-bottom: 24px;
+}
+
+
+/* NAVIGATION */
+
+.manager-navigation {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.sidebar-title {
+  color: #64748b;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 1.2px;
+
+  margin: 0 10px 10px;
+}
+
+
+.manager-nav-item {
+  width: 100%;
+
+  border: none;
+
+  background: transparent;
+
+  color: #94a3b8;
+
+  padding: 12px 13px;
+
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  text-align: left;
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.manager-nav-item:hover {
+  background: rgba(255,255,255,0.06);
+
+  color: white;
+
+  transform: translateX(2px);
+}
+
+.manager-nav-item.active {
+  background: linear-gradient(
+    90deg,
+    rgba(250,204,21,0.18),
+    rgba(250,204,21,0.06)
+  );
+
+  color: #facc15;
+
+  box-shadow:
+    inset 3px 0 0 #facc15;
+}
+
+.nav-icon {
+  width: 22px;
+
+  text-align: center;
+
+  font-size: 16px;
+}
+
+
+/* LOGOUT */
+
+.manager-sidebar-bottom {
+  margin-top: auto;
+
+  padding-top: 20px;
+}
+
+.manager-logout-btn {
+  width: 100%;
+
+  border: none;
+
+  background: rgba(255,255,255,0.04);
+
+  color: #94a3b8;
+
+  padding: 12px;
+
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  cursor: pointer;
+
+  font-size: 13px;
+
+  transition: 0.2s ease;
+}
+
+.manager-logout-btn:hover {
+  background: rgba(239,68,68,0.12);
+
+  color: #f87171;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.manager-main {
+  flex: 1;
+
+  padding: 34px 40px;
+
+  box-sizing: border-box;
+
+  overflow-x: auto;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.manager-page-header {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 30px;
+}
+
+.manager-page-header h1 {
+  margin: 0;
+
+  font-size: 28px;
+
+  color: #111827;
+
+  font-weight: 750;
+}
+
+.manager-page-header p {
+  margin: 7px 0 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+.manager-date {
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  padding: 10px 16px;
+
+  border-radius: 10px;
+
+  font-size: 13px;
+
+  color: #475569;
+
+  box-shadow:
+    0 2px 8px rgba(15,23,42,0.04);
+}
+
+
+/* =========================================================
+   STAT CARDS
+========================================================= */
+
+.manager-stats {
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  gap: 16px;
+
+  margin-bottom: 28px;
+}
+
+.manager-stat-card {
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 14px;
+
+  padding: 20px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  box-shadow:
+    0 4px 15px rgba(15,23,42,0.04);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.manager-stat-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 24px rgba(15,23,42,0.08);
+}
+
+.stat-icon {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 11px;
+
+  background: #f1f5f9;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 19px;
+}
+
+.manager-stat-card.interested
+.stat-icon {
+  background: #fef3c7;
+}
+
+.manager-stat-card p {
+  margin: 0 0 4px;
+
+  font-size: 11px;
+
+  color: #64748b;
+}
+
+.manager-stat-card h2 {
+  margin: 0;
+
+  font-size: 23px;
+
+  color: #111827;
+}
+
+
+/* =========================================================
+   SECTION
+========================================================= */
+
+.manager-section {
+  background: white;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 16px;
+
+  padding: 24px;
+
+  box-shadow:
+    0 4px 15px rgba(15,23,42,0.04);
+}
+
+.section-heading h2 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: 18px;
+}
+
+.section-heading p {
+  margin: 5px 0 20px;
+
+  color: #64748b;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   AGENT TABLE
+========================================================= */
+
+.agent-table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+.agent-performance-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  min-width: 750px;
+}
+
+.agent-performance-table th {
+  text-align: left;
+
+  padding: 13px 15px;
+
+  background: #f8fafc;
+
+  color: #64748b;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.agent-performance-table td {
+  padding: 15px;
+
+  color: #334155;
+
+  font-size: 13px;
+
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.agent-performance-table tbody tr:hover {
+  background: #fafafa;
+}
+
+
+/* =========================================================
+   PLACEHOLDER PAGES
+========================================================= */
+
+.manager-placeholder {
+  min-height: 500px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+}
+
+.manager-placeholder span {
+  font-size: 42px;
+
+  margin-bottom: 15px;
+}
+
+.manager-placeholder h2 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: 24px;
+}
+
+.manager-placeholder p {
+  margin-top: 8px;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+  .manager-stats {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+}
+
+@media (max-width: 800px) {
+
+  .manager-sidebar {
+    width: 210px;
+  }
+
+  .manager-main {
+    padding: 25px;
+  }
+
+  .manager-stats {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .manager-dashboard {
+    flex-direction: column;
+  }
+
+  .manager-sidebar {
+    width: 100%;
+
+    min-height: auto;
+  }
+
+  .manager-navigation {
+    display: grid;
+
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .manager-sidebar-bottom {
+    margin-top: 15px;
+  }
+
+  .manager-main {
+    padding: 20px;
+  }
+
+  .manager-page-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 15px;
+  }
+
+  .manager-stats {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+/* =========================================================
+   AGENT PERFORMANCE TABLE - FIT FULL WIDTH
+========================================================= */
+
+.manager-section {
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.agent-performance-table {
+  width: 100%;
+  min-width: 0 !important;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+/* Equal / compact column widths */
+
+.agent-performance-table th,
+.agent-performance-table td {
+  padding: 8px 6px;
+  font-size: 10px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Agent name column slightly wider */
+
+.agent-performance-table th:first-child,
+.agent-performance-table td:first-child {
+  width: 18%;
+  text-align: left;
+}
+
+/* Remaining columns */
+
+.agent-performance-table th:not(:first-child),
+.agent-performance-table td:not(:first-child) {
+  width: 16.4%;
+}
+
+/* Remove horizontal scrolling */
+
+.agent-performance-table-wrapper {
+  width: 100%;
+  overflow-x: hidden !important;
+}
+
+
+/* =========================================
+   UPLOAD DATA PAGE
+========================================= */
+
+.upload-data-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+.upload-page-header {
+  margin-bottom: 25px;
+}
+
+.upload-page-header h1 {
+  margin: 0;
+  font-size: 42px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.upload-page-header p {
+  margin-top: 8px;
+  font-size: 17px;
+  color: #64748b;
+}
+
+
+/* =========================================
+   UPLOAD CARD
+========================================= */
+
+.upload-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+}
+
+
+.upload-card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+
+.upload-icon {
+  width: 55px;
+  height: 55px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background: #fff4cc;
+
+  font-size: 26px;
+}
+
+
+.upload-card-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #111827;
+}
+
+
+.upload-card-header p {
+  margin: 4px 0 0;
+  color: #64748b;
+}
+
+
+/* =========================================
+   CHOOSE FILE
+========================================= */
+
+.choose-file-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 12px 22px;
+
+  border-radius: 10px;
+
+  background: #111827;
+  color: #ffffff;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+
+.choose-file-btn:hover {
+  background: #facc15;
+  color: #111827;
+  transform: translateY(-1px);
+}
+
+
+/* =========================================
+   SELECTED FILE
+========================================= */
+
+.selected-file {
+  margin-top: 18px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 12px 15px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 10px;
+
+  color: #334155;
+}
+
+
+/* =========================================
+   MESSAGES
+========================================= */
+
+.upload-success,
+.upload-error {
+  margin-top: 18px;
+
+  padding: 13px 16px;
+
+  border-radius: 10px;
+
+  font-weight: 600;
+}
+
+
+.upload-success {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+
+.upload-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+
+/* =========================================
+   SUMMARY
+========================================= */
+
+.upload-summary {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 15px;
+
+  margin-top: 20px;
+}
+
+
+.summary-box {
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 15px;
+
+  padding: 17px 20px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+}
+
+
+.summary-box > span {
+  font-size: 25px;
+}
+
+
+.summary-box small {
+  display: block;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+
+.summary-box strong {
+  display: block;
+
+  margin-top: 3px;
+
+  font-size: 25px;
+
+  color: #111827;
+}
+
+
+.summary-box.danger strong {
+  color: #dc2626;
+}
+
+
+/* =========================================
+   ASSIGNMENT CARD
+========================================= */
+
+.assignment-card {
+  margin-top: 20px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 18px;
+
+  padding: 25px;
+
+  box-shadow:
+    0 8px 25px rgba(15, 23, 42, 0.06);
+}
+
+
+.assignment-header {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 18px;
+}
+
+
+.assignment-header h2 {
+  margin: 0;
+
+  font-size: 23px;
+
+  color: #111827;
+}
+
+
+.assignment-header p {
+  margin: 5px 0 0;
+
+  color: #64748b;
+}
+
+
+.assignment-total {
+  padding: 9px 15px;
+
+  border-radius: 20px;
+
+  background: #fef3c7;
+
+  color: #92400e;
+
+  font-weight: 700;
+}
+
+
+/* =========================================
+   AGENT LIST
+========================================= */
+
+.agent-assignment-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+
+.agent-assignment-row {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 13px 16px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+}
+
+
+.agent-details {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+
+.agent-avatar {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #111827;
+
+  color: #ffffff;
+
+  font-weight: 700;
+}
+
+
+.agent-details strong {
+  display: block;
+
+  color: #111827;
+}
+
+
+.agent-details span {
+  display: block;
+
+  margin-top: 2px;
+
+  font-size: 12px;
+
+  color: #64748b;
+}
+
+
+/* =========================================
+   ASSIGNMENT INPUT
+========================================= */
+
+.assignment-input {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+
+.assignment-input label {
+  font-size: 13px;
+
+  color: #64748b;
+}
+
+
+.assignment-input input {
+  width: 90px;
+
+  height: 40px;
+
+  padding: 8px 10px;
+
+  border: 1px solid #cbd5e1;
+
+  border-radius: 8px;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  text-align: center;
+
+  outline: none;
+}
+
+
+.assignment-input input:focus {
+  border-color: #facc15;
+
+  box-shadow:
+    0 0 0 3px rgba(250, 204, 21, 0.15);
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.assignment-footer {
+  margin-top: 20px;
+
+  padding-top: 18px;
+
+  border-top: 1px solid #e5e7eb;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+
+.remaining-text {
+  color: #64748b;
+
+  font-size: 14px;
+}
+
+
+.all-assigned-text {
+  color: #059669;
+
+  font-size: 14px;
+
+  font-weight: 600;
+}
+
+
+.error-text {
+  color: #dc2626;
+
+  font-size: 14px;
+
+  font-weight: 600;
+}
+
+
+/* =========================================
+   ASSIGN BUTTON
+========================================= */
+
+.assign-calls-btn {
+  border: none;
+
+  padding: 13px 22px;
+
+  border-radius: 10px;
+
+  background: #111827;
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.assign-calls-btn:hover:not(:disabled) {
+  background: #facc15;
+
+  color: #111827;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 18px rgba(250, 204, 21, 0.25);
+}
+
+
+.assign-calls-btn:disabled {
+  opacity: 0.45;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================
+   LOADING / NO AGENTS
+========================================= */
+
+.loading-agents,
+.no-agents {
+  padding: 25px;
+
+  text-align: center;
+
+  color: #64748b;
+}
+
+/* =========================================================
+   COMPACT MANAGER DASHBOARD
+========================================================= */
+
+.manager-dashboard {
+  min-height: 100vh;
+  height: auto;
+  overflow: visible;
+}
+
+
+/* =========================
+   SIDEBAR COMPACT
+========================= */
+
+.manager-sidebar {
+  width: 220px;
+
+  /* min-height: 100%; */
+  height: 100%;
+
+  padding: 18px 12px;
+}
+
+
+/* Brand */
+
+.manager-brand {
+  gap: 9px;
+
+  padding: 2px 7px 15px;
+}
+
+.manager-logo {
+  width: 36px;
+  height: 36px;
+
+  border-radius: 10px;
+
+  font-size: 13px;
+}
+
+.manager-brand h2 {
+  font-size: 15px;
+}
+
+.manager-brand span {
+  font-size: 10px;
+
+  margin-top: 1px;
+}
+
+
+/* Divider */
+
+.sidebar-divider {
+  margin-bottom: 14px;
+}
+
+
+/* Management title */
+
+.sidebar-title {
+  font-size: 9px;
+
+  margin: 0 8px 6px;
+}
+
+
+/* Navigation */
+
+.manager-navigation {
+  gap: 2px;
+}
+
+.manager-nav-item {
+  padding: 9px 10px;
+
+  border-radius: 8px;
+
+  gap: 9px;
+
+  font-size: 12px;
+}
+
+.nav-icon {
+  width: 20px;
+
+  font-size: 14px;
+}
+
+
+/* Logout */
+
+.manager-sidebar-bottom {
+  padding-top: 10px;
+}
+
+.manager-logout-btn {
+  padding: 9px 10px;
+
+  font-size: 12px;
+}
+
+
+/* =========================
+   MAIN CONTENT
+========================= */
+
+.manager-main {
+  flex: 1;
+
+  padding: 22px 30px;
+
+  overflow: hidden;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.manager-page-header {
+  margin-bottom: 18px;
+}
+
+.manager-page-header h1 {
+  font-size: 24px;
+}
+
+.manager-page-header p {
+  margin-top: 4px;
+
+  font-size: 11px;
+}
+
+.manager-date {
+  padding: 7px 12px;
+
+  border-radius: 8px;
+
+  font-size: 11px;
+}
+
+
+/* =========================
+   STAT CARDS
+========================= */
+
+.manager-stats {
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  gap: 12px;
+
+  margin-bottom: 18px;
+}
+
+.manager-stat-card {
+  min-height: 82px;
+
+  padding: 13px 14px;
+
+  border-radius: 12px;
+
+  gap: 10px;
+}
+
+.stat-icon {
+  width: 34px;
+  height: 34px;
+
+  border-radius: 9px;
+
+  font-size: 16px;
+}
+
+.manager-stat-card p {
+  margin-bottom: 2px;
+
+  font-size: 10px;
+}
+
+.manager-stat-card h2 {
+  font-size: 20px;
+}
+
+
+/* =========================
+   PERFORMANCE SECTION
+========================= */
+
+.manager-section {
+  padding: 18px;
+
+  border-radius: 13px;
+}
+
+.section-heading h2 {
+  font-size: 16px;
+}
+
+.section-heading p {
+  margin: 3px 0 12px;
+
+  font-size: 10px;
+}
+
+
+/* =========================
+   TABLE
+========================= */
+
+.agent-performance-table th {
+  padding: 9px 11px;
+
+  font-size: 10px;
+}
+
+.agent-performance-table td {
+  padding: 10px 11px;
+
+  font-size: 11px;
+}
+
+
+/* =========================
+   PLACEHOLDER
+========================= */
+
+.manager-placeholder {
+  min-height: auto;
+
+  height: calc(100vh - 120px);
+}
+
+.manager-placeholder span {
+  font-size: 32px;
+
+  margin-bottom: 8px;
+}
+
+.manager-placeholder h2 {
+  font-size: 20px;
+}
+
+.manager-placeholder p {
+  margin-top: 5px;
+
+  font-size: 11px;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+
+    .agent-call-card {
+        padding: 18px;
+    }
+
+    .agent-call-card .lead-info h2 {
+        font-size: 20px;
+    }
+
+    .interested-fields {
+        grid-template-columns: 1fr;
+    }
+
+}
 
 /* =========================================
    LOADING / EMPTY / ERROR
