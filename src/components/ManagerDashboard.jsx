@@ -7,22 +7,169 @@ window.supabaseClient = supabase;
 function ManagerDashboard({ managerName }) {
   const [activeSection, setActiveSection] = useState("overview");
 
+  const [stats, setStats] = useState({
+  total: 0,
+  interested: 0,
+  notInterested: 0,
+  wrongNumber: 0,
+  notPicked: 0,
+});
+const [agentPerformance, setAgentPerformance] = useState([]);
+
+const fetchTodayStats = async () => {
+  try {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const startOfTomorrow = new Date(startOfDay);
+    startOfTomorrow.setDate(
+      startOfTomorrow.getDate() + 1
+    );
+
+    // ============================================
+    // FETCH TODAY'S COMPLETED CALLS
+    // ============================================
+
+    const { data: calls, error: callsError } =
+      await supabase
+        .from("calls")
+        .select(
+          "id, agent_id, status, created_at"
+        )
+        .not("status", "is", null)
+        .gte(
+          "created_at",
+          startOfDay.toISOString()
+        )
+        .lt(
+          "created_at",
+          startOfTomorrow.toISOString()
+        );
+
+    if (callsError) {
+      console.error(
+        "Error fetching today's calls:",
+        callsError
+      );
+      return;
+    }
+
+    const completedToday = (calls || []).filter(
+      (call) =>
+        call.status &&
+        call.status.trim() !== ""
+    );
+
+    // ============================================
+    // OVERALL STATS
+    // ============================================
+
+    setStats({
+      total: completedToday.length,
+
+      interested: completedToday.filter(
+        (call) =>
+          call.status === "Interested"
+      ).length,
+
+      notInterested: completedToday.filter(
+        (call) =>
+          call.status === "Not Interested"
+      ).length,
+
+      wrongNumber: completedToday.filter(
+        (call) =>
+          call.status === "Wrong Number"
+      ).length,
+
+      notPicked: completedToday.filter(
+        (call) =>
+          call.status === "Not Picked"
+      ).length,
+    });
+
+    // ============================================
+    // FETCH ALL AGENTS
+    // ============================================
+
+    const { data: agents, error: agentsError } =
+      await supabase
+        .from("profiles")
+        .select(
+          "user_id, name"
+        )
+        .eq("role", "agent");
+
+    if (agentsError) {
+      console.error(
+        "Error fetching agents:",
+        agentsError
+      );
+      return;
+    }
+
+    // ============================================
+    // CREATE AGENT-WISE STATS
+    // ============================================
+
+    const performance = agents.map(
+      (agent) => {
+
+        const agentCalls =
+          completedToday.filter(
+            (call) =>
+              call.agent_id === agent.user_id
+          );
+
+        return {
+          agent_id: agent.user_id,
+
+          name: agent.name || "Agent",
+
+          total: agentCalls.length,
+
+          interested:
+            agentCalls.filter(
+              (call) =>
+                call.status === "Interested"
+            ).length,
+
+          notInterested:
+            agentCalls.filter(
+              (call) =>
+                call.status === "Not Interested"
+            ).length,
+
+          wrongNumber:
+            agentCalls.filter(
+              (call) =>
+                call.status === "Wrong Number"
+            ).length,
+
+          notPicked:
+            agentCalls.filter(
+              (call) =>
+                call.status === "Not Picked"
+            ).length,
+        };
+      }
+    );
+    console.log("FINAL AGENT PERFORMANCE:", performance);
+
+    setAgentPerformance(performance);
+
+  } catch (error) {
+    console.error(
+      "Unexpected admin stats error:",
+      error
+    );
+  }
+};
+
   useEffect(() => {
-  const testAgents = async () => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("user_id, name, role, approval_status")
-      .eq("role", "agent");
-
-    console.log("================================");
-    console.log("ALL AGENTS:", data);
-    console.log("TOTAL AGENTS:", data?.length || 0);
-    console.log("ERROR:", error);
-    console.log("================================");
-  };
-
-  testAgents();
+  fetchTodayStats();
 }, []);
+
 
   const menuItems = [
     {
@@ -88,7 +235,7 @@ function ManagerDashboard({ managerName }) {
                 <span className="stat-icon">📞</span>
                 <div>
                   <p>Total Calls</p>
-                  <h2>0</h2>
+                  <h2>{stats.total}</h2>
                 </div>
               </div>
 
@@ -96,7 +243,7 @@ function ManagerDashboard({ managerName }) {
                 <span className="stat-icon">⭐</span>
                 <div>
                   <p>Interested</p>
-                  <h2>0</h2>
+                  <h2>{stats.interested}</h2>
                 </div>
               </div>
 
@@ -104,7 +251,7 @@ function ManagerDashboard({ managerName }) {
                 <span className="stat-icon">❌</span>
                 <div>
                   <p>Not Interested</p>
-                  <h2>0</h2>
+                  <h2>{stats.notInterested}</h2>
                 </div>
               </div>
 
@@ -112,7 +259,7 @@ function ManagerDashboard({ managerName }) {
                 <span className="stat-icon">☎️</span>
                 <div>
                   <p>Wrong Number</p>
-                  <h2>0</h2>
+                  <h2>{stats.wrongNumber}</h2>
                 </div>
               </div>
 
@@ -120,7 +267,7 @@ function ManagerDashboard({ managerName }) {
                 <span className="stat-icon">📵</span>
                 <div>
                   <p>Not Picked</p>
-                  <h2>0</h2>
+                  <h2>{stats.notPicked}</h2>
                 </div>
               </div>
             </div>
@@ -149,10 +296,30 @@ function ManagerDashboard({ managerName }) {
                   </thead>
 
                   <tbody>
-                    <tr>
-                      <td colSpan="6">No agent data available yet.</td>
-                    </tr>
-                  </tbody>
+  {agentPerformance.length > 0 ? (
+    agentPerformance.map((agent) => (
+      <tr key={agent.agent_id}>
+        <td>{agent.name}</td>
+
+        <td>{agent.total}</td>
+
+        <td>{agent.interested}</td>
+
+        <td>{agent.notInterested}</td>
+
+        <td>{agent.wrongNumber}</td>
+
+        <td>{agent.notPicked}</td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="6">
+        No agent data available yet.
+      </td>
+    </tr>
+  )}
+</tbody>
                 </table>
               </div>
             </div>

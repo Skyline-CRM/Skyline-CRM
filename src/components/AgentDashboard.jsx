@@ -17,73 +17,177 @@ function AgentDashboard({ refreshTrigger }) {
   const [loading, setLoading] = useState(true);
   const [currentCallIndex, setCurrentCallIndex] = useState(0);
   const [savingCall, setSavingCall] = useState(false);
-  const currentCall = calls[currentCallIndex];
-  const goToNextCall = () => {
-  setSelectedStatus({});
-  setInterestedData({});
 
-  setCurrentCallIndex((prev) => prev + 1);
-};
-
-  // Temporary status selection for each call
+  // Temporary status selection
   const [selectedStatus, setSelectedStatus] = useState({});
 
-  // Temporary interested fields
+  // Temporary Interested fields
   const [interestedData, setInterestedData] = useState({});
 
-  // ============================================
+  const currentCall = calls[currentCallIndex];
+
+  // =========================================================
   // GET LOGGED-IN USER
-  // ============================================
+  // =========================================================
 
   useEffect(() => {
     const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      try {
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser();
 
-      if (!user) {
+        if (error) {
+          console.error(
+            "Error getting logged-in user:",
+            error
+          );
+
+          setLoading(false);
+          return;
+        }
+
+        if (!user) {
+          console.log("No logged-in user found.");
+
+          setLoading(false);
+          return;
+        }
+
+        console.log("Logged-in agent:", user.id);
+
+        setUser(user);
+
+        const name =
+          user.user_metadata?.name ||
+          user.user_metadata?.full_name ||
+          user.email?.split("@")[0] ||
+          "Agent";
+
+        setUserName(name);
+      } catch (error) {
+        console.error(
+          "Unexpected user error:",
+          error
+        );
+
         setLoading(false);
-        return;
       }
-
-      console.log("Logged-in agent:", user.id);
-
-      setUser(user);
-
-      const name =
-        user.user_metadata?.name ||
-        user.user_metadata?.full_name ||
-        user.email?.split("@")[0] ||
-        "Agent";
-
-      setUserName(name);
     };
 
     getUser();
   }, []);
 
-  // ============================================
-  // FETCH CALLS WHEN USER / REFRESH CHANGES
-  // ============================================
+  // =========================================================
+  // FETCH DATA WHEN USER / REFRESH CHANGES
+  // =========================================================
 
   useEffect(() => {
-    if (user) {
-      fetchAgentCalls();
-    }
+    if (!user) return;
+
+    fetchAgentCalls();
+    fetchTodayStats();
   }, [user, refreshTrigger]);
 
-  // ============================================
-  // FETCH AGENT CALLS
-  // ============================================
+  // =========================================================
+  // FETCH TODAY'S COMPLETED CALLS
+  //
+  // TODAY'S CALLS =
+  //
+  // agent_id = current agent
+  // status IS NOT NULL
+  // created_at = today
+  //
+  // created_at is updated whenever the agent saves a call.
+  // =========================================================
+
+ const fetchTodayStats = async () => {
+  if (!user) return;
+
+  try {
+    console.log(
+      "Fetching today's stats for agent:",
+      user.id
+    );
+
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const startOfTomorrow = new Date(startOfDay);
+    startOfTomorrow.setDate(
+      startOfTomorrow.getDate() + 1
+    );
+
+    const startISO = startOfDay.toISOString();
+    const endISO = startOfTomorrow.toISOString();
+
+    const { data, error } = await supabase
+      .from("calls")
+      .select("id, status, created_at")
+      .eq("agent_id", user.id)
+      .not("status", "is", null)
+      .gte("created_at", startISO)
+      .lt("created_at", endISO);
+
+    if (error) {
+      console.error(
+        "Error fetching today's stats:",
+        error
+      );
+      return;
+    }
+
+    const completedToday = (data || []).filter(
+      (call) =>
+        call.status &&
+        call.status.trim() !== ""
+    );
+
+    const newStats = {
+      total: completedToday.length,
+
+      interested: completedToday.filter(
+        (call) => call.status === "Interested"
+      ).length,
+
+      notInterested: completedToday.filter(
+        (call) => call.status === "Not Interested"
+      ).length,
+
+      wrongNumber: completedToday.filter(
+        (call) => call.status === "Wrong Number"
+      ).length,
+
+      notPicked: completedToday.filter(
+        (call) => call.status === "Not Picked"
+      ).length,
+    };
+
+    setStats(newStats);
+
+  } catch (error) {
+    console.error(
+      "Unexpected stats error:",
+      error
+    );
+  }
+};
+
+  // =========================================================
+  // FETCH ASSIGNED CALLS
+  //
+  // ASSIGNED CALLS =
+  //
+  // agent_id = current agent
+  // status IS NULL
+  // =========================================================
 
   const fetchAgentCalls = async () => {
+    if (!user) return;
+
     try {
       setLoading(true);
-
-      console.log(
-        "Fetching calls for agent:",
-        user.id
-      );
 
       const { data, error } = await supabase
         .from("calls")
@@ -100,9 +204,8 @@ function AgentDashboard({ refreshTrigger }) {
           preferred_location,
           preference,
           agent_id,
-          created_at,
           created_at
-        `,
+        `
         )
         .eq("agent_id", user.id)
         .is("status", null)
@@ -112,119 +215,96 @@ function AgentDashboard({ refreshTrigger }) {
 
       if (error) {
         console.error(
-  "Error fetching agent calls:",
-  error.message,
-  error.details,
-  error.hint
-);
+          "Error fetching agent calls:",
+          error.message,
+          error.details,
+          error.hint
+        );
+
         return;
       }
-
-      console.log(
-        "Calls for this agent:",
-        data
-      );
 
       const agentCalls = data || [];
 
       setCalls(agentCalls);
 
-      // ========================================
-      // CALCULATE STATS
-      // ========================================
+      // Prevent invalid current index
+      setCurrentCallIndex((prevIndex) => {
+        if (agentCalls.length === 0) {
+          return 0;
+        }
 
-      setStats({
-        total: agentCalls.length,
+        if (prevIndex >= agentCalls.length) {
+          return 0;
+        }
 
-        interested: agentCalls.filter(
-          (call) =>
-            call.status === "Interested"
-        ).length,
-
-        notInterested: agentCalls.filter(
-          (call) =>
-            call.status === "Not Interested"
-        ).length,
-
-        wrongNumber: agentCalls.filter(
-          (call) =>
-            call.status === "Wrong Number"
-        ).length,
-
-        notPicked: agentCalls.filter(
-          (call) =>
-            call.status === "Not Picked"
-        ).length,
+        return prevIndex;
       });
-    } catch (err) {
+    } catch (error) {
       console.error(
-        "Unexpected error:",
-        err
+        "Unexpected error fetching calls:",
+        error
       );
     } finally {
       setLoading(false);
     }
   };
 
-  // ============================================
-  // STATUS CHANGE
-  // ============================================
+  // =========================================================
+  // HANDLE CALL FIELD CHANGE
+  // =========================================================
 
-const handleStatusChange = (callId, status) => {
+  const handleCallFieldChange = (
+    callId,
+    field,
+    value
+  ) => {
+    setCalls((prevCalls) =>
+      prevCalls.map((call) =>
+        call.id === callId
+          ? {
+              ...call,
+              [field]: value,
+            }
+          : call
+      )
+    );
+  };
 
-  // Only update the selected status in React state
-  setSelectedStatus((prev) => ({
-    ...prev,
-    [callId]: status,
-  }));
-
-  // IMPORTANT:
-  // Status is NOT saved to Supabase here.
+  // =========================================================
+  // HANDLE STATUS CHANGE
   //
-  // The call will be saved only when
-  // "Save & Next Call" button is clicked.
-};
+  // This only changes temporary React state.
+  // Supabase is updated when Save & Next is clicked.
+  // =========================================================
 
-  // ============================================
-  // UPDATE STATUS
-  // ============================================
-
-  const updateCallStatus = async (
+  const handleStatusChange = (
     callId,
     status
   ) => {
-    if (!user) return;
+    setSelectedStatus((prev) => ({
+      ...prev,
+      [callId]: status,
+    }));
 
-    const { error } = await supabase
-      .from("calls")
-      .update({
-        status: status,
-        created_at:
-          new Date().toISOString(),
-      })
-      .eq("id", callId)
-      .eq("agent_id", user.id);
+    // If agent changes away from Interested,
+    // remove temporary Interested data.
+    if (status !== "Interested") {
+      setInterestedData((prev) => {
+        const updated = {
+          ...prev,
+        };
 
-    if (error) {
-      console.error(
-        "Error updating call:",
-        error
-      );
-      return;
+        delete updated[callId];
+
+        return updated;
+      });
     }
-
-    console.log(
-      "Call status updated:",
-      callId,
-      status
-    );
-
-    fetchAgentCalls();
   };
 
-  // ============================================
-  // INTERESTED FIELD CHANGE
-  // ============================================
+  // =========================================================
+  // HANDLE INTERESTED FIELD CHANGE
+  // =========================================================
 
   const handleInterestedFieldChange = (
     callId,
@@ -241,71 +321,246 @@ const handleStatusChange = (callId, status) => {
     }));
   };
 
-  // ============================================
-  // SAVE INTERESTED CALL
-  // ============================================
+  // =========================================================
+  // SAVE CALL & GO TO NEXT
+  // =========================================================
 
-  const saveInterestedCall = async (callId) => {
+  const saveCall = async (callId) => {
+    if (!user) {
+      console.error(
+        "No logged-in user."
+      );
 
-  const data = interestedData[callId];
+      return;
+    }
 
-  if (!data?.budget) {
-    alert("Please enter budget.");
-    return;
-  }
-
-  if (!data?.preferred_location) {
-    alert("Please enter preferred location.");
-    return;
-  }
-
-  if (!data?.preference) {
-    alert("Please enter preference.");
-    return;
-  }
-
-  setSavingCall(true);
-
-  const { error } = await supabase
-    .from("calls")
-    .update({
-      status: "Interested",
-      budget: data.budget,
-      preferred_location: data.preferred_location,
-      preference: data.preference,
-    })
-    .eq("id", callId)
-    .eq("agent_id", user.id);
-
-  if (error) {
-    console.error(
-      "Error saving interested call:",
-      error
+    const call = calls.find(
+      (item) => item.id === callId
     );
 
-    setSavingCall(false);
-    return;
-  }
+    if (!call) {
+      console.error(
+        "Call not found:",
+        callId
+      );
 
-  // Remove completed call
-  setCalls((prev) =>
-    prev.filter((call) => call.id !== callId)
-  );
+      return;
+    }
 
-  setInterestedData({});
-  setSelectedStatus({});
+    const status =
+      selectedStatus[callId];
 
-  setCurrentCallIndex(0);
+    // =====================================================
+    // STATUS REQUIRED
+    // =====================================================
 
-  setSavingCall(false);
+    if (!status) {
+      alert(
+        "Please select a call status."
+      );
 
-  // Refresh dashboard stats
-  fetchAgentCalls();
-};
+      return;
+    }
 
-  // ============================================
+    // =====================================================
+    // INTERESTED VALIDATION
+    // =====================================================
+
+    const interested =
+      interestedData[callId] || {};
+
+    if (status === "Interested") {
+      if (!interested.budget?.trim()) {
+        alert(
+          "Please enter budget."
+        );
+
+        return;
+      }
+
+      if (
+        !interested.preferred_location?.trim()
+      ) {
+        alert(
+          "Please enter preferred location."
+        );
+
+        return;
+      }
+
+      if (
+        !interested.preference?.trim()
+      ) {
+        alert(
+          "Please enter preference."
+        );
+
+        return;
+      }
+    }
+
+    try {
+      setSavingCall(true);
+
+      // ===================================================
+      // UPDATE DATA
+      //
+      // IMPORTANT:
+      //
+      // We intentionally update created_at whenever the
+      // agent saves the call.
+      //
+      // This makes created_at represent the latest
+      // status-update/completion time.
+      // ===================================================
+
+      const updateData = {
+        email: call.email || null,
+
+        location:
+          call.location || null,
+
+        remarks:
+          call.remarks || null,
+
+        status: status,
+
+        created_at:
+          new Date().toISOString(),
+      };
+
+      // ===================================================
+      // INTERESTED DATA
+      // ===================================================
+
+      if (status === "Interested") {
+        updateData.budget =
+          interested.budget?.trim() ||
+          null;
+
+        updateData.preferred_location =
+          interested.preferred_location?.trim() ||
+          null;
+
+        updateData.preference =
+          interested.preference?.trim() ||
+          null;
+      } else {
+        // Clear Interested-only fields
+        updateData.budget = null;
+
+        updateData.preferred_location =
+          null;
+
+        updateData.preference =
+          null;
+      }
+
+      // ===================================================
+      // UPDATE SUPABASE
+      // ===================================================
+
+      const { data, error } =
+        await supabase
+          .from("calls")
+          .update(updateData)
+          .eq("id", callId)
+          .eq("agent_id", user.id)
+          .select();
+
+      if (error) {
+        console.error(
+          "Error saving call:",
+          error.message,
+          error.details,
+          error.hint
+        );
+
+        alert(
+          "Failed to save call. Please try again."
+        );
+
+        return;
+      }
+
+      // ===================================================
+      // REMOVE COMPLETED CALL FROM LOCAL STATE
+      // ===================================================
+
+      setCalls((prevCalls) =>
+        prevCalls.filter(
+          (item) => item.id !== callId
+        )
+      );
+
+      // ===================================================
+      // CLEAR SELECTED STATUS
+      // ===================================================
+
+      setSelectedStatus((prev) => {
+        const updated = {
+          ...prev,
+        };
+
+        delete updated[callId];
+
+        return updated;
+      });
+
+      // ===================================================
+      // CLEAR INTERESTED DATA
+      // ===================================================
+
+      setInterestedData((prev) => {
+        const updated = {
+          ...prev,
+        };
+
+        delete updated[callId];
+
+        return updated;
+      });
+
+      // ===================================================
+      // RESET CALL INDEX
+      // ===================================================
+
+      setCurrentCallIndex(0);
+
+      // ===================================================
+      // REFRESH ASSIGNED CALLS
+      // ===================================================
+
+      await fetchAgentCalls();
+
+      // ===================================================
+      // REFRESH TOP STATS
+      //
+      // THIS IS IMPORTANT.
+      //
+      // Without this, the top counters would remain
+      // unchanged until another dashboard refresh.
+      // ===================================================
+
+      await fetchTodayStats();
+
+    } catch (error) {
+      console.error(
+        "Unexpected save error:",
+        error
+      );
+
+      alert(
+        "Something went wrong while saving the call."
+      );
+    } finally {
+      setSavingCall(false);
+    }
+  };
+
+  // =========================================================
   // GREETING
-  // ============================================
+  // =========================================================
 
   const currentHour =
     new Date().getHours();
@@ -320,174 +575,23 @@ const handleStatusChange = (callId, status) => {
     greeting = "Good Evening";
   }
 
-  // ============================================
-  // LOADING
-  // ============================================
+  // =========================================================
+  // INITIAL LOADING
+  // =========================================================
 
   if (loading && !user) {
     return null;
   }
 
-  // ============================================
+  // =========================================================
   // UI
-  // ============================================
-
-
-  // ============================================
-// SAVE CALL & GO TO NEXT
-// ============================================
-
-const saveCall = async (callId) => {
-  const call = calls.find(
-    (item) => item.id === callId
-  );
-
-  if (!call) {
-    console.error("Call not found.");
-    return;
-  }
-
-  const status = selectedStatus[callId];
-
-  // Status required
-  if (!status) {
-    alert("Please select a call status.");
-    return;
-  }
-
-  // ============================================
-  // INTERESTED VALIDATION
-  // ============================================
-
-  const interested =
-    interestedData[callId] || {};
-
-  if (status === "Interested") {
-
-    if (!interested.budget?.trim()) {
-      alert("Please enter budget.");
-      return;
-    }
-
-    if (!interested.preferred_location?.trim()) {
-      alert("Please enter preferred location.");
-      return;
-    }
-
-    if (!interested.preference?.trim()) {
-      alert("Please enter preference.");
-      return;
-    }
-  }
-
-  setSavingCall(true);
-
-  // ============================================
-  // DATA TO SAVE
-  // ============================================
-
-  const updateData = {
-    email: call.email || null,
-    location: call.location || null,
-    remarks: call.remarks || null,
-    status: status,
-  };
-
-  // Only Interested gets these 3 fields
-  if (status === "Interested") {
-
-    updateData.budget =
-      interested.budget || null;
-
-    updateData.preferred_location =
-      interested.preferred_location || null;
-
-    updateData.preference =
-      interested.preference || null;
-
-  } else {
-
-    // Clear interested-only fields
-    updateData.budget = null;
-    updateData.preferred_location = null;
-    updateData.preference = null;
-  }
-
-  // ============================================
-  // SAVE TO SUPABASE
-  // ============================================
-
-  const { error } = await supabase
-    .from("calls")
-    .update(updateData)
-    .eq("id", callId)
-    .eq("agent_id", user.id);
-
-  if (error) {
-
-    console.error(
-      "Error saving call:",
-      error
-    );
-
-    alert("Failed to save call.");
-
-    setSavingCall(false);
-
-    return;
-  }
-
-  // ============================================
-  // REMOVE COMPLETED CALL
-  // ============================================
-
-  setCalls((prevCalls) =>
-    prevCalls.filter(
-      (item) => item.id !== callId
-    )
-  );
-
-  // ============================================
-  // CLEAR TEMPORARY DATA
-  // ============================================
-
-  setSelectedStatus((prev) => {
-
-    const updated = {
-      ...prev,
-    };
-
-    delete updated[callId];
-
-    return updated;
-  });
-
-  setInterestedData((prev) => {
-
-    const updated = {
-      ...prev,
-    };
-
-    delete updated[callId];
-
-    return updated;
-  });
-
-  // ============================================
-  // NEXT CALL
-  // ============================================
-
-  setCurrentCallIndex(0);
-
-  setSavingCall(false);
-
-  // Refresh stats
-  fetchAgentCalls();
-};
+  // =========================================================
 
   return (
     <div className="agent-dashboard">
-      {/* GREETING */}
+      {/* =====================================================
+          GREETING
+      ===================================================== */}
 
       <div className="agent-welcome">
         <h1>
@@ -497,9 +601,9 @@ const saveCall = async (callId) => {
         <p>Here's your call performance for today.</p>
       </div>
 
-      {/* ======================================
+      {/* =====================================================
           STATS
-      ====================================== */}
+      ===================================================== */}
 
       <div className="stats">
         <div className="stat-card">
@@ -509,56 +613,66 @@ const saveCall = async (callId) => {
 
         <div className="stat-card">
           <h3>{stats.interested}</h3>
+
           <p>Interested</p>
         </div>
 
         <div className="stat-card">
           <h3>{stats.notInterested}</h3>
+
           <p>Not Interested</p>
         </div>
 
         <div className="stat-card">
           <h3>{stats.wrongNumber}</h3>
+
           <p>Wrong Number</p>
         </div>
 
         <div className="stat-card">
           <h3>{stats.notPicked}</h3>
+
           <p>Not Picked</p>
         </div>
       </div>
 
-      {/* ======================================
+      {/* =====================================================
           ASSIGNED CALLS
-      ====================================== */}
+      ===================================================== */}
 
       <div className="assigned-leads">
-        <div className="assigned-leads-header">
-          <h2>My Assigned Calls</h2>
+        {/* <div className="assigned-leads-header">
 
-          <span>{calls.length} Calls</span>
-        </div>
+          <h2>
+            My Assigned Calls
+          </h2>
+
+          <span>
+            {calls.length} Calls
+          </span>
+
+        </div> */}
 
         {calls.length === 0 ? (
-          <div className="no-leads">No calls assigned to you.</div>
+          <div className="no-leads">🎉 All assigned calls are completed!</div>
         ) : (
           <div className="lead-list">
             {currentCall ? (
               <div className="agent-call-card">
-                {/* =========================
-              CALL NUMBER
-          ========================= */}
-
-                <div className="call-number">Call #{currentCallIndex + 1}</div>
-
-                {/* =========================
-              CUSTOMER INFORMATION
-          ========================= */}
+                {/* =================================================
+                    CUSTOMER INFORMATION
+                ================================================= */}
 
                 <div className="lead-info">
-                  <h2>{currentCall.customer_name}</h2>
+                  <h2 className="customer-call-heading">
+                    <span className="customer-name">
+                      {currentCall.customer_name}
+                    </span>
 
-                  <p>📞 {currentCall.contact_no}</p>
+                    <span className="customer-number">
+                      📞 {currentCall.contact_no}
+                    </span>
+                  </h2>
 
                   {/* EMAIL */}
 
@@ -576,6 +690,7 @@ const saveCall = async (callId) => {
                           e.target.value,
                         )
                       }
+                      disabled={savingCall}
                     />
                   </div>
 
@@ -595,6 +710,7 @@ const saveCall = async (callId) => {
                           e.target.value,
                         )
                       }
+                      disabled={savingCall}
                     />
                   </div>
 
@@ -613,13 +729,14 @@ const saveCall = async (callId) => {
                           e.target.value,
                         )
                       }
+                      disabled={savingCall}
                     />
                   </div>
                 </div>
 
-                {/* =========================
-              STATUS
-          ========================= */}
+                {/* =================================================
+                    STATUS
+                ================================================= */}
 
                 <div className="lead-action">
                   <label>Call Status</label>
@@ -643,9 +760,9 @@ const saveCall = async (callId) => {
                   </select>
                 </div>
 
-                {/* =========================
-              INTERESTED SECTION
-          ========================= */}
+                {/* =================================================
+                    INTERESTED SECTION
+                ================================================= */}
 
                 {selectedStatus[currentCall.id] === "Interested" && (
                   <div className="interested-panel">
@@ -670,6 +787,7 @@ const saveCall = async (callId) => {
                               e.target.value,
                             )
                           }
+                          disabled={savingCall}
                         />
                       </div>
 
@@ -692,6 +810,7 @@ const saveCall = async (callId) => {
                               e.target.value,
                             )
                           }
+                          disabled={savingCall}
                         />
                       </div>
 
@@ -713,11 +832,16 @@ const saveCall = async (callId) => {
                               e.target.value,
                             )
                           }
+                          disabled={savingCall}
                         />
                       </div>
                     </div>
                   </div>
                 )}
+
+                {/* =================================================
+                    SAVE BUTTON
+                ================================================= */}
 
                 <button
                   type="button"
@@ -739,7 +863,5 @@ const saveCall = async (callId) => {
     </div>
   );
 }
-
-
 
 export default AgentDashboard;
