@@ -654,7 +654,7 @@ function AgentDashboard({ refreshTrigger }) {
         </div> */}
 
         {calls.length === 0 ? (
-          <div className="no-leads">🎉 All assigned calls are completed!</div>
+          <div className="no-leads">🎉 Saara data khtm ho gya beta!😝<br /> Sir se data maag lo!! 🤪</div>
         ) : (
           <div className="lead-list">
             {currentCall ? (
