@@ -126,7 +126,6 @@ select,
 textarea {
     width: 100%;
     padding: 13px 15px;
-    color: white;
     font-size: 14px;
     transition: 0.3s;
     box-sizing: border-box;
@@ -2464,9 +2463,7 @@ nav {
 
 .assignment-input {
   display: flex;
-
   align-items: center;
-
   gap: 10px;
 }
 
