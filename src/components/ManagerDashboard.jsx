@@ -3,28 +3,262 @@ import { useState } from "react";
 import UploadData from "./UploadData";
 import { useEffect } from "react";
 window.supabaseClient = supabase;
+import * as XLSX from "xlsx";
+
+
 
 function ManagerDashboard({ managerName }) {
+
   const [activeSection, setActiveSection] = useState("overview");
 
-  const [stats, setStats] = useState({
-  total: 0,
-  interested: 0,
-  notInterested: 0,
-  wrongNumber: 0,
-  notPicked: 0,
-});
-const [agentPerformance, setAgentPerformance] = useState([]);
+  // ========================================
+  // INTERESTED LEADS
+  // ========================================
 
-const fetchTodayStats = async () => {
-  try {
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
+  const [interestedLeads, setInterestedLeads] = useState([]);
+  const [interestedLeadsLoading, setInterestedLeadsLoading] = useState(false);
+  const [interestedLeadsError, setInterestedLeadsError] = useState("");
 
-    const startOfTomorrow = new Date(startOfDay);
-    startOfTomorrow.setDate(
-      startOfTomorrow.getDate() + 1
+  // ========================================
+  // ASSIGNED CALLS
+  // ========================================
+
+  const [assignedCalls, setAssignedCalls] = useState([]);
+  const [assignedCallsLoading, setAssignedCallsLoading] = useState(false);
+  const [assignedCallsError, setAssignedCallsError] = useState("");
+
+  // ========================================
+  // DOWNLOAD INTERESTED LEADS EXCEL
+  // ========================================
+
+  const downloadInterestedLeadsExcel = () => {
+    if (!interestedLeads || interestedLeads.length === 0) {
+      return;
+    }
+
+    const excelData = interestedLeads.map((lead) => ({
+      Customer: lead.customer_name || "",
+      Contact: lead.contact_no || "",
+      Email: lead.email || "",
+      Location: lead.location || "",
+      Agent: lead.agent_name || "",
+      Budget: lead.budget || "",
+      "Preferred Location": lead.preferred_location || "",
+      Preference: lead.preference || "",
+      Remarks: lead.remarks || "",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Interested Leads"
     );
+
+    XLSX.writeFile(
+      workbook,
+      "Interested_Leads.xlsx"
+    );
+  };
+
+  // ========================================
+  // FETCH ASSIGNED CALLS
+  // ========================================
+
+  const fetchAssignedCalls = async () => {
+    setAssignedCallsLoading(true);
+    setAssignedCallsError("");
+
+    try {
+      // Get calls where status has not been updated
+      const { data: calls, error: callsError } = await supabase
+        .from("calls")
+        .select("agent_id, status")
+        .or("status.is.null,status.eq.");
+
+      if (callsError) {
+        console.error("Error fetching assigned calls:", callsError);
+        setAssignedCallsError("Unable to load assigned calls.");
+        setAssignedCalls([]);
+        return;
+      }
+
+      // Get agent names
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("user_id, name");
+
+      if (profilesError) {
+        console.error("Error fetching agent profiles:", profilesError);
+        setAssignedCallsError("Unable to load agent names.");
+        setAssignedCalls([]);
+        return;
+      }
+
+      // Count pending calls for each agent
+      const agentCounts = {};
+
+      (calls || []).forEach((call) => {
+        if (!call.agent_id) return;
+
+        if (!agentCounts[call.agent_id]) {
+          agentCounts[call.agent_id] = 0;
+        }
+
+        agentCounts[call.agent_id]++;
+      });
+
+      // Convert counts into table data
+      const result = Object.entries(agentCounts).map(
+        ([agentId, count]) => {
+          const agent = (profiles || []).find(
+            (profile) => profile.user_id === agentId
+          );
+
+          return {
+            agent_id: agentId,
+            agent_name: agent?.name || "Unknown Agent",
+            pending_calls: count,
+          };
+        }
+      );
+
+      // Highest pending calls first
+      result.sort((a, b) => b.pending_calls - a.pending_calls);
+
+      setAssignedCalls(result);
+
+    } catch (err) {
+      console.error("Unexpected error fetching assigned calls:", err);
+      setAssignedCallsError("Unable to load assigned calls.");
+      setAssignedCalls([]);
+    } finally {
+      setAssignedCallsLoading(false);
+    }
+  };
+
+  // ========================================
+  // FETCH INTERESTED LEADS
+  // ========================================
+
+  const fetchInterestedLeads = async () => {
+    setInterestedLeadsLoading(true);
+    setInterestedLeadsError("");
+
+    try {
+      // Get all interested leads
+      const { data: leads, error: leadsError } = await supabase
+        .from("calls")
+        .select(`
+          id,
+          customer_name,
+          contact_no,
+          email,
+          location,
+          status,
+          remarks,
+          budget,
+          preferred_location,
+          preference,
+          agent_id,
+          created_at
+        `)
+        .eq("status", "Interested")
+        .order("created_at", { ascending: false });
+
+      if (leadsError) {
+        console.error("Error fetching interested leads:", leadsError);
+        setInterestedLeadsError("Unable to load interested leads.");
+        setInterestedLeads([]);
+        return;
+      }
+
+      // Get agent names
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("user_id, name");
+
+      if (profilesError) {
+        console.error("Error fetching agent profiles:", profilesError);
+        setInterestedLeadsError("Unable to load agent names.");
+        setInterestedLeads([]);
+        return;
+      }
+
+      // Match agent_id with profiles.user_id
+      const leadsWithAgentNames = (leads || []).map((lead) => {
+        const agent = (profiles || []).find(
+          (profile) => profile.user_id === lead.agent_id
+        );
+
+        return {
+          ...lead,
+          agent_name: agent?.name || "-",
+        };
+      });
+
+      setInterestedLeads(leadsWithAgentNames);
+
+    } catch (err) {
+      console.error("Unexpected error fetching interested leads:", err);
+      setInterestedLeadsError("Unable to load interested leads.");
+      setInterestedLeads([]);
+
+    } finally {
+      setInterestedLeadsLoading(false);
+    }
+  };
+
+  // ========================================
+  // INTERESTED LEADS EFFECT
+  // ========================================
+
+  useEffect(() => {
+    console.log("Active section:", activeSection);
+
+    if (activeSection === "interested") {
+      console.log("Interested Leads tab opened!");
+      fetchInterestedLeads();
+    }
+  }, [activeSection]);
+
+  // ========================================
+  // ASSIGNED CALLS EFFECT
+  // ========================================
+
+  useEffect(() => {
+    if (activeSection === "AssignedCalls") {
+      fetchAssignedCalls();
+    }
+  }, [activeSection]);
+
+
+  // ========================================
+  // EXISTING STATS
+  // ========================================
+
+  const [stats, setStats] = useState({
+    total: 0,
+    interested: 0,
+    notInterested: 0,
+    wrongNumber: 0,
+    notPicked: 0,
+  });
+
+  const [agentPerformance, setAgentPerformance] = useState([]);
+
+  const fetchTodayStats = async () => {
+    try {
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const startOfTomorrow = new Date(startOfDay);
+      startOfTomorrow.setDate(
+        startOfTomorrow.getDate() + 1
+      );
 
     // ============================================
     // FETCH TODAY'S COMPLETED CALLS
@@ -198,9 +432,9 @@ const fetchTodayStats = async () => {
       label: "Upload Data",
     },
     {
-      id: "calls",
+      id: "AssignedCalls",
       icon: "📋",
-      label: "All Calls",
+      label: "Pending Calls",
     },
   ];
 
@@ -296,30 +530,28 @@ const fetchTodayStats = async () => {
                   </thead>
 
                   <tbody>
-  {agentPerformance.length > 0 ? (
-    agentPerformance.map((agent) => (
-      <tr key={agent.agent_id}>
-        <td>{agent.name}</td>
+                    {agentPerformance.length > 0 ? (
+                      agentPerformance.map((agent) => (
+                        <tr key={agent.agent_id}>
+                          <td>{agent.name}</td>
 
-        <td>{agent.total}</td>
+                          <td>{agent.total}</td>
 
-        <td>{agent.interested}</td>
+                          <td>{agent.interested}</td>
 
-        <td>{agent.notInterested}</td>
+                          <td>{agent.notInterested}</td>
 
-        <td>{agent.wrongNumber}</td>
+                          <td>{agent.wrongNumber}</td>
 
-        <td>{agent.notPicked}</td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan="6">
-        No agent data available yet.
-      </td>
-    </tr>
-  )}
-</tbody>
+                          <td>{agent.notPicked}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="6">No agent data available yet.</td>
+                      </tr>
+                    )}
+                  </tbody>
                 </table>
               </div>
             </div>
@@ -331,9 +563,7 @@ const fetchTodayStats = async () => {
           <div className="manager-placeholder">
             <span>📅</span>
             <h2>Monthly Reports</h2>
-            <p>
-              Monthly performance reports will appear here.
-            </p>
+            <p>Monthly performance reports will appear here.</p>
           </div>
         );
 
@@ -342,36 +572,192 @@ const fetchTodayStats = async () => {
           <div className="manager-placeholder">
             <span>👥</span>
             <h2>Agent Reports</h2>
-            <p>
-              Detailed agent-wise reports will appear here.
-            </p>
+            <p>Detailed agent-wise reports will appear here.</p>
           </div>
         );
 
       case "interested":
         return (
-          <div className="manager-placeholder">
-            <span>⭐</span>
-            <h2>Interested Leads</h2>
-            <p>
-              All interested leads will appear here.
-            </p>
+          <div>
+            {" "}
+            <div className="manager-page-header">
+              {" "}
+              <div>
+                {" "}
+                <h1>Interested Leads</h1>{" "}
+                <p>All customers marked as interested by your agents.</p>{" "}
+              </div>{" "}
+              <div className="interested-leads-actions">
+                <div className="interested-leads-count">
+                  {interestedLeads.length} Leads
+                </div>
+
+                <button
+                  type="button"
+                  className="interested-leads-download"
+                  onClick={downloadInterestedLeadsExcel}
+                  disabled={interestedLeads.length === 0}
+                >
+                  Download Excel
+                </button>
+              </div>{" "}
+            </div>{" "}
+            <div className="manager-section">
+              {" "}
+              {interestedLeadsLoading && (
+                <p className="interested-leads-message">
+                  {" "}
+                  Loading interested leads...{" "}
+                </p>
+              )}{" "}
+              {!interestedLeadsLoading && interestedLeadsError && (
+                <p className="interested-leads-error">
+                  {" "}
+                  {interestedLeadsError}{" "}
+                </p>
+              )}{" "}
+              {!interestedLeadsLoading &&
+                !interestedLeadsError &&
+                interestedLeads.length === 0 && (
+                  <p className="interested-leads-message">
+                    {" "}
+                    No interested leads found yet.{" "}
+                  </p>
+                )}{" "}
+              {!interestedLeadsLoading &&
+                !interestedLeadsError &&
+                interestedLeads.length > 0 && (
+                  <div className="interested-leads-table-wrapper">
+                    {" "}
+                    <table className="interested-leads-table">
+                      <thead>
+                        <tr>
+                          <th>Customer</th>
+                          <th>Contact</th>
+                          <th>Email</th>
+                          <th>Location</th>
+                          <th>Agent</th>
+                          <th>Budget</th>
+                          <th>Preferred Location</th>
+                          <th>Preference</th>
+                          {/* <th>Status</th> */}
+                          <th>Remarks</th>
+                          {/* <th>Date</th> */}
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {interestedLeads.map((lead) => (
+                          <tr key={lead.id}>
+                            <td>{lead.customer_name || "-"}</td>
+
+                            <td>{lead.contact_no || "-"}</td>
+
+                            <td>{lead.email || "-"}</td>
+
+                            <td>{lead.location || "-"}</td>
+
+                            <td>{lead.agent_name || "-"}</td>
+
+                            <td>{lead.budget || "-"}</td>
+
+                            <td>{lead.preferred_location || "-"}</td>
+
+                            <td>{lead.preference || "-"}</td>
+
+                            {/* <td>
+                              <span className="interested-status">
+                                {lead.status}
+                              </span>
+                            </td> */}
+
+                            <td>{lead.remarks || "-"}</td>
+
+                            {/* <td>
+                              {lead.created_at
+                                ? new Date(lead.created_at).toLocaleDateString(
+                                    "en-IN",
+                                  )
+                                : "-"}
+                            </td> */}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}{" "}
+            </div>{" "}
           </div>
         );
 
       case "upload":
         return <UploadData />;
 
-      case "calls":
-        return (
-          <div className="manager-placeholder">
-            <span>📋</span>
-            <h2>All Calls</h2>
-            <p>
-              Complete call records will appear here.
+      case "AssignedCalls":
+  return (
+    <div>
+      <div className="manager-page-header">
+        <div>
+          <h1>Pending Calls</h1>
+          <p>Calls assigned to agents that are waiting for a status update.</p>
+        </div>
+
+        <div className="interested-leads-count">
+          {assignedCalls.reduce(
+            (total, agent) => total + agent.pending_calls,
+            0
+          )}{" "}
+          Pending
+        </div>
+      </div>
+
+      <div className="manager-section">
+        {assignedCallsLoading && (
+          <p className="interested-leads-message">
+            Loading assigned calls...
+          </p>
+        )}
+
+        {!assignedCallsLoading && assignedCallsError && (
+          <p className="interested-leads-error">
+            {assignedCallsError}
+          </p>
+        )}
+
+        {!assignedCallsLoading &&
+          !assignedCallsError &&
+          assignedCalls.length === 0 && (
+            <p className="interested-leads-message">
+              No pending assigned calls found.
             </p>
-          </div>
-        );
+          )}
+
+        {!assignedCallsLoading &&
+          !assignedCallsError &&
+          assignedCalls.length > 0 && (
+            <div className="interested-leads-table-wrapper">
+              <table className="interested-leads-table">
+                <thead>
+                  <tr>
+                    <th>Agent Name</th>
+                    <th>Pending Calls</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {assignedCalls.map((agent) => (
+                    <tr key={agent.agent_id}>
+                      <td>{agent.agent_name}</td>
+                      <td>{agent.pending_calls}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+      </div>
+    </div>
+  );
 
       default:
         return null;
@@ -435,6 +821,9 @@ const fetchTodayStats = async () => {
     </div>
   );
 }
+
+
+
 
 const handleManagerLogout = async () => {
   const { error } = await supabase.auth.signOut();

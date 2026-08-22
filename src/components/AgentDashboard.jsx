@@ -641,7 +641,7 @@ function AgentDashboard({ refreshTrigger }) {
       ===================================================== */}
 
       <div className="assigned-leads">
-        {/* <div className="assigned-leads-header">
+        <div className="assigned-leads-header">
 
           <h2>
             My Assigned Calls
@@ -651,7 +651,7 @@ function AgentDashboard({ refreshTrigger }) {
             {calls.length} Calls
           </span>
 
-        </div> */}
+        </div>
 
         {calls.length === 0 ? (
           <div className="no-leads">🎉 Saara data khtm ho gya beta!😝<br /> Sir se data maag lo!! 🤪</div>
