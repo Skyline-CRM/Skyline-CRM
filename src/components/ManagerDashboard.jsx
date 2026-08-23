@@ -4,6 +4,7 @@ import UploadData from "./UploadData";
 import { useEffect } from "react";
 window.supabaseClient = supabase;
 import * as XLSX from "xlsx";
+import companyLogo from "/logo.png";
 
 
 
@@ -446,7 +447,7 @@ function ManagerDashboard({ managerName }) {
             <div className="manager-page-header">
               {/* LEFT */}
               <div>
-                <h1>Hello, {managerName} 👋</h1>
+                <h1>Hello, {managerName} 🙏 </h1>
 
                 <p>Let's see team's performance today.</p>
               </div>
@@ -773,33 +774,28 @@ function ManagerDashboard({ managerName }) {
 
       <aside className="manager-sidebar">
         <div className="manager-brand">
-          <div className="manager-logo">SI</div>
-
-          <div>
-            <h2>Skyline Infra</h2>
-            <span>Manager Panel</span>
+          <div className="manager-logo">
+            <img src={companyLogo} alt="Company Logo" />
+             <h3>Manager Panel</h3>
+            
           </div>
+
+        
         </div>
 
-        <div className="sidebar-divider"></div>
+        {menuItems.map((item) => (
+          <button
+            key={item.id}
+            className={`manager-nav-item ${
+              activeSection === item.id ? "active" : ""
+            }`}
+            onClick={() => setActiveSection(item.id)}
+          >
+            <span className="nav-icon">{item.icon}</span>
 
-        <nav className="manager-navigation">
-          <p className="sidebar-title">MANAGEMENT</p>
-
-          {menuItems.map((item) => (
-            <button
-              key={item.id}
-              className={`manager-nav-item ${
-                activeSection === item.id ? "active" : ""
-              }`}
-              onClick={() => setActiveSection(item.id)}
-            >
-              <span className="nav-icon">{item.icon}</span>
-
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </nav>
+            <span>{item.label}</span>
+          </button>
+        ))}
 
         <div className="manager-sidebar-bottom">
           <button

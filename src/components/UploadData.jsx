@@ -947,7 +947,7 @@ function UploadData() {
 
           <div>
             <span>
-              Valid Calls
+              Valid Calls{"  "}
             </span>
 
             <strong>
@@ -958,7 +958,7 @@ function UploadData() {
 
           <div>
             <span>
-              Skipped
+              Skipped{"  "}
             </span>
 
             <strong>

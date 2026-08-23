@@ -14,14 +14,36 @@
 html,
 body,
 #root {
+  margin: 0;
+  padding: 0;
   width: 100%;
   min-height: 100%;
 }
 
 body {
+  overflow: auto;
+}
+
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app main {
+  flex: 1;
+}
+
+footer {
+  flex-shrink: 0;
+}
+
+
+body {
   background: linear-gradient(135deg, #0f172a, #111827, #1e293b);
 
-  min-height: 100vh;
+  /* min-height: 100vh; */
   color: white;
 
   /* IMPORTANT:
@@ -890,18 +912,12 @@ nav {
 
 .leads-count {
   padding: 8px 14px;
-
   background: rgba(200, 169, 106, 0.12);
-
   border: 1px solid rgba(200, 169, 106, 0.25);
-
   border-radius: 20px;
-
   color: #c8a96a;
-
   font-size: 13px;
   font-weight: 600;
-
   white-space: nowrap;
 }
 
@@ -911,21 +927,15 @@ nav {
 
 .leads-table-wrapper {
   width: 100%;
-
   overflow-x: auto;
-
   border-radius: 12px;
-
   border: 1px solid rgba(255, 255, 255, 0.08);
-
   background: rgba(17, 24, 39, 0.75);
 }
 
 .leads-table {
   width: 100%;
-
   border-collapse: collapse;
-
   min-width: 850px;
 }
 
@@ -933,18 +943,12 @@ nav {
 
 .leads-table th {
   padding: 13px 12px;
-
   text-align: left;
-
   background: rgba(255, 255, 255, 0.04);
-
   color: #c8a96a;
-
   font-size: 12px;
   font-weight: 600;
-
   white-space: nowrap;
-
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -952,13 +956,9 @@ nav {
 
 .leads-table td {
   padding: 12px;
-
   color: #d1d5db;
-
   font-size: 12px;
-
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-
   vertical-align: middle;
 }
 
@@ -992,17 +992,11 @@ nav {
 
 .lead-status {
   display: inline-block;
-
   padding: 5px 9px;
-
   border-radius: 20px;
-
   background: rgba(34, 197, 94, 0.1);
-
   border: 1px solid rgba(34, 197, 94, 0.2);
-
   color: #86efac;
-
   font-size: 11px;
   font-weight: 600;
 }
@@ -1013,25 +1007,19 @@ nav {
 
 .remarks-cell {
   min-width: 220px;
-
   max-width: 300px;
 }
 
 .remarks-display {
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
-
   gap: 10px;
 }
 
 .remarks-display span {
   flex: 1;
-
   line-height: 1.4;
-
   word-break: break-word;
 }
 
@@ -1039,37 +1027,24 @@ nav {
 
 .edit-remarks-btn {
   flex: 0 0 auto;
-
   width: 30px;
   height: 30px;
-
   padding: 0;
-
   margin: 0;
-
   border: 1px solid rgba(200, 169, 106, 0.25);
-
   border-radius: 7px;
-
   background: rgba(200, 169, 106, 0.08);
-
   color: #c8a96a;
-
   cursor: pointer;
-
   font-size: 13px;
-
   display: flex;
-
   align-items: center;
   justify-content: center;
 }
 
 .edit-remarks-btn:hover {
   background: rgba(200, 169, 106, 0.18);
-
   transform: none;
-
   box-shadow: none;
 }
 
@@ -1083,27 +1058,18 @@ nav {
 
 .remarks-edit textarea {
   width: 100%;
-
   min-height: 65px;
-
   padding: 9px;
-
   resize: vertical;
-
   border-radius: 7px;
-
   background: #111827;
-
   border: 1px solid rgba(200, 169, 106, 0.35);
-
   color: white;
-
   font-size: 12px;
 }
 
 .remarks-edit textarea:focus {
   outline: none;
-
   border-color: #c8a96a;
 }
 
@@ -1242,15 +1208,11 @@ nav {
   margin-top: 20px;
   padding: 20px;
   border-radius: 16px;
-
   background: linear-gradient(135deg,
       rgba(200, 169, 106, 0.13),
       rgba(15, 118, 110, 0.12));
-
   border: 1px solid rgba(200, 169, 106, 0.35);
-
   box-shadow: 0 0 25px rgba(200, 169, 106, 0.08);
-
   animation: interestedAppear 0.45s ease;
 }
 
@@ -1315,24 +1277,16 @@ nav {
 
 .save-interested-btn {
   grid-column: 1 / -1;
-
   width: 100%;
   margin-top: 5px;
-
   padding: 13px 20px;
-
   border: none;
   border-radius: 10px;
-
   background: linear-gradient(90deg, #c8a96a, #e1c47b);
-
   color: #111827;
-
   font-size: 14px;
   font-weight: 700;
-
   cursor: pointer;
-
   box-shadow: 0 8px 20px rgba(200, 169, 106, 0.18);
 
   transition:
@@ -1343,9 +1297,7 @@ nav {
 
 .save-interested-btn:hover {
   transform: translateY(-2px);
-
   box-shadow: 0 12px 28px rgba(200, 169, 106, 0.32);
-
   filter: brightness(1.08);
 }
 
@@ -1367,12 +1319,9 @@ nav {
   width: 100%;
   padding: 45px 20px;
   text-align: center;
-
   border-radius: 16px;
-
   background: rgba(17, 24, 39, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.06);
-
   color: #9ca3af;
   font-size: 15px;
 }
@@ -1382,10 +1331,12 @@ nav {
 ========================================================= */
 
 .manager-dashboard {
-  min-height: 100vh;
-  display: flex;
+  height: 100vh;
+  width: 100%;
+  /* display: flex; */
   background: #f5f7fb;
   color: #111827;
+  overflow: hidden;
 }
 
 /* =========================================================
@@ -1394,16 +1345,20 @@ nav {
 
 .manager-sidebar {
   width: 250px;
-  min-height: 100vh;
-
+  height: 100vh;
   background: #0b1220;
-
   display: flex;
   flex-direction: column;
-
   padding: 24px 16px;
-
   box-sizing: border-box;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* BRAND */
@@ -1412,101 +1367,54 @@ nav {
   display: flex;
   align-items: center;
   gap: 12px;
-
   padding: 4px 8px 22px;
-}
-
-.manager-logo {
-  width: 42px;
-  height: 42px;
-
-  border-radius: 12px;
-
-  background: linear-gradient(135deg, #facc15, #f59e0b);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-weight: 800;
-  color: #111827;
-
-  font-size: 15px;
 }
 
 .manager-brand h2 {
   margin: 0;
-
   color: white;
-
   font-size: 17px;
   font-weight: 700;
 }
 
 .manager-brand span {
   display: block;
-
   margin-top: 3px;
-
   color: #94a3b8;
-
   font-size: 11px;
 }
 
-/* DIVIDER */
 
-.sidebar-divider {
-  height: 1px;
-
-  background: rgba(255, 255, 255, 0.08);
-
-  margin-bottom: 24px;
-}
 
 /* NAVIGATION */
 
 .manager-navigation {
   display: flex;
   flex-direction: column;
-
   gap: 6px;
 }
 
-.sidebar-title {
+/* .sidebar-title {
   color: #64748b;
-
   font-size: 10px;
   font-weight: 700;
-
   letter-spacing: 1.2px;
-
   margin: 0 10px 10px;
-}
+} */
 
 .manager-nav-item {
   width: 100%;
-
   border: none;
-
   background: transparent;
-
   color: #94a3b8;
-
   padding: 12px 13px;
-
   border-radius: 10px;
-
   display: flex;
   align-items: center;
-
   gap: 12px;
-
   text-align: left;
-
   font-size: 13px;
-
   cursor: pointer;
-
   transition:
     background 0.2s ease,
     color 0.2s ease,
@@ -1515,9 +1423,7 @@ nav {
 
 .manager-nav-item:hover {
   background: rgba(255, 255, 255, 0.06);
-
   color: white;
-
   transform: translateX(2px);
 }
 
@@ -1527,15 +1433,12 @@ nav {
       rgba(250, 204, 21, 0.06));
 
   color: #facc15;
-
   box-shadow: inset 3px 0 0 #facc15;
 }
 
 .nav-icon {
   width: 22px;
-
   text-align: center;
-
   font-size: 16px;
 }
 
@@ -1543,38 +1446,26 @@ nav {
 
 .manager-sidebar-bottom {
   margin-top: auto;
-
   padding-top: 20px;
 }
 
 .manager-logout-btn {
   width: 100%;
-
   border: none;
-
   background: rgba(255, 255, 255, 0.04);
-
   color: #94a3b8;
-
   padding: 12px;
-
   border-radius: 10px;
-
   display: flex;
   align-items: center;
-
   gap: 12px;
-
   cursor: pointer;
-
   font-size: 13px;
-
   transition: 0.2s ease;
 }
 
 .manager-logout-btn:hover {
   background: rgba(239, 68, 68, 0.12);
-
   color: #f87171;
 }
 
@@ -1583,13 +1474,14 @@ nav {
 ========================================================= */
 
 .manager-main {
-  flex: 1;
+  margin-left: 230px;
+  width: calc(100% - 250px);
+  height: 100vh;
 
-  padding: 34px 40px;
-
+  padding: 34px 20px;
   box-sizing: border-box;
 
-  overflow-x: auto;
+  overflow: hidden;
 }
 
 /* =========================================================
@@ -1598,45 +1490,31 @@ nav {
 
 .manager-page-header {
   display: flex;
-
   justify-content: space-between;
-
   align-items: center;
-
-  margin-bottom: 30px;
+  margin-bottom: 10px;
 }
 
 .manager-page-header h1 {
   margin: 0;
-
   font-size: 28px;
-
   color: #111827;
-
   font-weight: 750;
 }
 
 .manager-page-header p {
   margin: 7px 0 0;
-
   color: #64748b;
-
   font-size: 13px;
 }
 
 .manager-date {
   background: white;
-
   border: 1px solid #e5e7eb;
-
   padding: 10px 16px;
-
   border-radius: 10px;
-
   font-size: 13px;
-
   color: #475569;
-
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
@@ -1723,13 +1601,9 @@ nav {
 
 .manager-section {
   background: white;
-
   border: 1px solid #e5e7eb;
-
   border-radius: 16px;
-
   padding: 24px;
-
   box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
 }
 
@@ -2422,9 +2296,10 @@ nav {
 ========================================================= */
 
 .manager-dashboard {
-  min-height: 100vh;
-  height: auto;
-  overflow: visible;
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* =========================
@@ -2433,59 +2308,53 @@ nav {
 
 .manager-sidebar {
   width: 220px;
-
-  /* min-height: 100%; */
-  height: 100%;
-
+  height: 100vh;
+  flex-shrink: 0;
   padding: 18px 12px;
+  box-sizing: border-box;
 }
 
 /* Brand */
 
 .manager-brand {
-  gap: 9px;
-
-  padding: 2px 7px 15px;
+  gap: 2px;
+  /* padding: 2px 7px 15px; */
 }
 
 .manager-logo {
-  width: 36px;
-  height: 36px;
-
-  border-radius: 10px;
-
-  font-size: 13px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 5px;
+  margin-bottom: 5px;
 }
 
-.manager-brand h2 {
-  font-size: 15px;
+.manager-logo img {
+  width: 180px;
+  height: auto;
+  max-height: 70px;
+  object-fit: contain;
+  display: block;
 }
 
-.manager-brand span {
-  font-size: 10px;
 
-  margin-top: 1px;
+
+.manager-logo h3 {
+  margin: 10px 0 0;
+  color: rgb(172, 171, 171);
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
 }
 
 /* Divider */
 
 .sidebar-divider {
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
-/* Management title */
-
-.sidebar-title {
-  font-size: 9px;
-
-  margin: 0 8px 6px;
-}
-
-/* Navigation */
-
-.manager-navigation {
-  gap: 2px;
-}
 
 .manager-nav-item {
   padding: 9px 10px;
@@ -2520,11 +2389,14 @@ nav {
 ========================= */
 
 .manager-main {
-  flex: 1;
-
+   flex: 1;
+  min-width: 0;
+  height: 100vh;
   padding: 22px 30px;
+  box-sizing: border-box;
 
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* =========================
@@ -2599,8 +2471,7 @@ nav {
 ========================= */
 
 .manager-section {
-  padding: 18px;
-
+  padding: 10px;
   border-radius: 13px;
 }
 
@@ -2610,7 +2481,6 @@ nav {
 
 .section-heading p {
   margin: 3px 0 12px;
-
   font-size: 10px;
 }
 
@@ -2620,13 +2490,11 @@ nav {
 
 .agent-performance-table th {
   padding: 9px 11px;
-
   font-size: 10px;
 }
 
 .agent-performance-table td {
   padding: 10px 11px;
-
   font-size: 11px;
 }
 
@@ -2696,15 +2564,51 @@ nav {
   font-weight: 700;
 }
 
+/* Interested Leads Table Scroll */
 .interested-leads-table-wrapper {
   width: 100%;
+  height: 500px;
+
+  overflow-y: scroll;
   overflow-x: auto;
+
+  border: 1px solid #ddd;
 }
+
+/* Visible Y-axis scrollbar */
+.interested-leads-table-wrapper::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.interested-leads-table-wrapper::-webkit-scrollbar-track {
+  background: #e5e5e5;
+}
+
+.interested-leads-table-wrapper::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 6px;
+}
+
+.interested-leads-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Table */
+.interested-leads-table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+}
+
 
 .interested-leads-table {
   width: 100%;
   min-width: 900px;
   border-collapse: collapse;
+  overflow-y: scroll;
+  overflow-x: auto;
+
 }
 
 .interested-leads-table th,
@@ -2749,6 +2653,27 @@ nav {
   color: #b91c1c;
 }
 
+
+.project-footer {
+  text-align: center;
+  padding: 12px 20px;
+  font-size: 13px;
+  color: #94a3b8;
+  background: #0f172a;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.project-footer a {
+  color: #60a5fa;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.project-footer a:hover {
+  color: #93c5fd;
+  text-decoration: underline;
+}
 /* =========================================
    MOBILE
 ========================================= */
