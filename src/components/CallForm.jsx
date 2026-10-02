@@ -148,6 +148,7 @@ function CallForm({ onCallSaved,resetTrigger }) {
         >
           <option value="">Select Status</option>
           <option>Interested</option>
+          <option>Follow up</option>
           <option>Not Interested</option>
           <option>Wrong Number</option>
           <option>Not Connected</option>

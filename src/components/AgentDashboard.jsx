@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../services/supabase";
 
-function AgentDashboard({ refreshTrigger }) {
+function AgentDashboard({ refreshTrigger, searchNumber, editCallId }) {
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState("Agent");
 
@@ -25,6 +25,127 @@ function AgentDashboard({ refreshTrigger }) {
   const [interestedData, setInterestedData] = useState({});
 
   const currentCall = calls[currentCallIndex];
+
+  // =========================================================
+// SEARCH CONTACT NUMBER
+// =========================================================
+
+const searchContact = async (number) => {
+  if (!number) return;
+
+  try {
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from("calls")
+      .select(
+        `
+        id,
+        customer_name,
+        contact_no,
+        email,
+        location,
+        status,
+        remarks,
+        budget,
+        preferred_location,
+        preference
+        `,
+      )
+      .eq("contact_no", number)
+      .eq("agent_id", user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Search error:", error);
+      alert("Unable to search this contact.");
+      return;
+    }
+
+    if (!data) {
+      alert("No lead found with this contact number.");
+      return;
+    }
+
+    setCalls([data]);
+    setCurrentCallIndex(0);
+
+    setSelectedStatus({
+      [data.id]: data.status || "",
+    });
+
+    setInterestedData({
+      [data.id]: {
+        budget: data.budget || "",
+        preferred_location: data.preferred_location || "",
+        preference: data.preference || "",
+      },
+    });
+
+  } catch (error) {
+    console.error("Unexpected search error:", error);
+    alert("Something went wrong while searching.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+const loadCallForEdit = async (callId) => {
+  try {
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from("calls")
+      .select(`
+        id,
+        customer_name,
+        contact_no,
+        email,
+        location,
+        status,
+        remarks,
+        budget,
+        preferred_location,
+        preference,
+        agent_id,
+        created_at
+      `)
+      .eq("id", callId)
+      .eq("agent_id", user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Error loading lead:", error);
+      return;
+    }
+
+    if (!data) {
+      alert("This lead could not be found.");
+      return;
+    }
+
+    setCalls([data]);
+    setCurrentCallIndex(0);
+
+    setSelectedStatus({
+      [data.id]: data.status || "",
+    });
+
+    setInterestedData({
+      [data.id]: {
+        budget: data.budget || "",
+        preferred_location: data.preferred_location || "",
+        preference: data.preference || "",
+      },
+    });
+  } catch (error) {
+    console.error("Error loading follow up:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   // =========================================================
   // GET LOGGED-IN USER
@@ -84,11 +205,21 @@ function AgentDashboard({ refreshTrigger }) {
   // =========================================================
 
   useEffect(() => {
-    if (!user) return;
+  if (!user) return;
 
-    fetchAgentCalls();
-    fetchTodayStats();
-  }, [user, refreshTrigger]);
+  if (editCallId) {
+    loadCallForEdit(editCallId);
+    return;
+  }
+
+  if (searchNumber) {
+    searchContact(searchNumber);
+    return;
+  }
+
+  fetchAgentCalls();
+  fetchTodayStats();
+}, [user, refreshTrigger, searchNumber, editCallId]);
 
   // =========================================================
   // FETCH TODAY'S COMPLETED CALLS
@@ -654,7 +785,7 @@ function AgentDashboard({ refreshTrigger }) {
         </div>
 
         {calls.length === 0 ? (
-          <div className="no-leads">🎉 Saara data khtm ho gya beta!😝<br /> Sir se data maag lo!! 🤪</div>
+          <div className="no-leads">All calls completed. Data finished!</div>
         ) : (
           <div className="lead-list">
             {currentCall ? (
@@ -749,9 +880,8 @@ function AgentDashboard({ refreshTrigger }) {
                     disabled={savingCall}
                   >
                     <option value="">Select Status</option>
-
                     <option value="Interested">Interested</option>
-
+                    <option value="Follow up">Follow up</option>
                     <option value="Not Interested">Not Interested</option>
 
                     <option value="Wrong Number">Wrong Number</option>

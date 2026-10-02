@@ -5,7 +5,7 @@ import Auth from "../components/Auth";
 import AgentDashboard from "../components/AgentDashboard";
 import { supabase } from "../services/supabase";
 import Leads from "../components/Leads";
-
+import FollowUps from "../components/FollowUps";
 
 function Home() {
   const [user, setUser] = useState(null);
@@ -13,24 +13,24 @@ function Home() {
 
   const [profile, setProfile] = useState(null);
 
-  // Refresh dashboard stats
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Reset CallForm
   const [formResetTrigger, setFormResetTrigger] = useState(0);
 
-  // Leads page
   const [showLeads, setShowLeads] = useState(false);
 
+  const [showFollowUps, setShowFollowUps] = useState(false);
+
+  const [editCallId, setEditCallId] = useState(null);
+
+  const [searchNumber, setSearchNumber] = useState("");
 
   // =========================
   // GET CURRENT USER
   // =========================
 
   useEffect(() => {
-
     const getCurrentUser = async () => {
-
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -38,7 +38,6 @@ function Home() {
       setUser(user);
 
       if (user) {
-
         const { data: profileData, error } = await supabase
           .from("profiles")
           .select("name, role, approval_status")
@@ -50,30 +49,22 @@ function Home() {
         }
 
         setProfile(profileData);
-
-        console.log("PROFILE:", profileData);
       }
 
       setLoading(false);
     };
 
-
     getCurrentUser();
-
-
-    // Listen for login/logout
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-
         const loggedInUser = session?.user ?? null;
 
         setUser(loggedInUser);
 
         if (loggedInUser) {
-
           const { data: profileData, error } = await supabase
             .from("profiles")
             .select("name, role, approval_status")
@@ -85,32 +76,22 @@ function Home() {
           }
 
           setProfile(profileData);
-
-          console.log("PROFILE:", profileData);
-
         } else {
-
           setProfile(null);
-
         }
-
       }
     );
-
 
     return () => {
       subscription.unsubscribe();
     };
-
   }, []);
-
 
   // =========================
   // LOGOUT
   // =========================
 
   const handleLogout = async () => {
-
     const { error } = await supabase.auth.signOut();
 
     if (error) {
@@ -122,20 +103,19 @@ function Home() {
     setProfile(null);
   };
 
-
   // =========================
   // HOME CLICK
   // =========================
 
   const handleHomeClick = () => {
-
     setShowLeads(false);
+    setShowFollowUps(false);
+    setEditCallId(null);
+    setSearchNumber("");
 
     setRefreshTrigger((prev) => prev + 1);
-
     setFormResetTrigger((prev) => prev + 1);
   };
-
 
   // =========================
   // LEADS CLICK
@@ -143,8 +123,54 @@ function Home() {
 
   const handleLeadsClick = () => {
     setShowLeads(true);
+    setShowFollowUps(false);
+    setEditCallId(null);
+    setSearchNumber("");
   };
 
+  // =========================
+  // FOLLOW UP CLICK
+  // =========================
+
+  const handleFollowUpsClick = () => {
+    setShowLeads(false);
+    setShowFollowUps(true);
+    setEditCallId(null);
+    setSearchNumber("");
+  };
+
+  // =========================
+  // EDIT LEAD
+  // =========================
+
+  const handleEditLead = (callId) => {
+    setEditCallId(callId);
+    setShowLeads(false);
+    setShowFollowUps(false);
+    setSearchNumber("");
+  };
+
+  // =========================
+  // EDIT FOLLOW UP
+  // =========================
+
+  const handleEditFollowUp = (callId) => {
+    setEditCallId(callId);
+    setShowLeads(false);
+    setShowFollowUps(false);
+    setSearchNumber("");
+  };
+
+  // =========================
+  // SEARCH CONTACT
+  // =========================
+
+  const handleSearch = (number) => {
+    setSearchNumber(number);
+    setShowLeads(false);
+    setShowFollowUps(false);
+    setEditCallId(null);
+  };
 
   // =========================
   // LOADING
@@ -154,7 +180,6 @@ function Home() {
     return null;
   }
 
-
   // =========================
   // LOGGED OUT
   // =========================
@@ -162,7 +187,6 @@ function Home() {
   if (!user) {
     return <Auth onClose={() => {}} />;
   }
-
 
   // =========================
   // APPROVAL CHECK
@@ -173,10 +197,8 @@ function Home() {
     profile &&
     profile.approval_status !== "approved"
   ) {
-
     return (
       <div className="approval-message">
-
         <h2>
           Account Pending Approval
         </h2>
@@ -189,38 +211,29 @@ function Home() {
         <button onClick={handleLogout}>
           Logout
         </button>
-
       </div>
     );
-
   }
-
 
   // =========================
   // PROFILE LOADING
   // =========================
 
   if (user && !profile) {
-
     return (
       <div className="approval-message">
-
         <h2>
           Loading Profile...
         </h2>
-
       </div>
     );
-
   }
-
 
   // =========================
   // ADMIN / MANAGER
   // =========================
 
   if (profile?.role === "admin") {
-
     return (
       <ManagerDashboard
         managerName={
@@ -231,9 +244,7 @@ function Home() {
         }
       />
     );
-
   }
-
 
   // =========================
   // AGENT
@@ -241,7 +252,6 @@ function Home() {
 
   return (
     <>
-
       <Navbar
         userName={
           profile?.name ||
@@ -250,30 +260,27 @@ function Home() {
           "User"
         }
         onHome={handleHomeClick}
+        onFollowUps={handleFollowUpsClick}
         onLeads={handleLeadsClick}
         onLogout={handleLogout}
+        onSearch={handleSearch}
       />
 
-
       <div className="container">
-
         {showLeads ? (
-
-          <Leads />
-
+          <Leads onEditLead={handleEditLead} />
+        ) : showFollowUps ? (
+          <FollowUps onEditFollowUp={handleEditFollowUp} />
         ) : (
-
           <AgentDashboard
             refreshTrigger={refreshTrigger}
+            searchNumber={searchNumber}
+            editCallId={editCallId}
           />
-
         )}
-
       </div>
-
     </>
   );
 }
-
 
 export default Home;

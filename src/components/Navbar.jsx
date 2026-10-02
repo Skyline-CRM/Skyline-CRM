@@ -1,7 +1,18 @@
 import { useState } from "react";
 
-function Navbar({ userName, onLogout, onLeads, onHome }) {
+function Navbar({ userName, onLogout, onLeads, onHome, onSearch, onFollowUps }) {
   const [showMenu, setShowMenu] = useState(false);
+  const [searchNumber, setSearchNumber] = useState("");
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      const number = searchNumber.replace(/\D/g, "");
+
+      if (!number) return;
+
+      onSearch(number);
+    }
+  };
 
 
   return (
@@ -12,13 +23,18 @@ function Navbar({ userName, onLogout, onLeads, onHome }) {
       </div>
 
         <input
-          type="text"
-          placeholder="🔍 Search Contact Number"
-          className="search-box"
-        />
+        type="text"
+        placeholder="🔍 Search Contact Number"
+        className="search-box"
+        value={searchNumber}
+        onChange={(e) => setSearchNumber(e.target.value)}
+        onKeyDown={handleSearch}
+        inputMode="numeric"
+      />
 
         <ul className="nav-links">
           <li onClick={onHome}>Home</li>
+          <li onClick={onFollowUps}>Follow-up</li>
           <li onClick={onLeads}>Leads</li>
         </ul>
 
