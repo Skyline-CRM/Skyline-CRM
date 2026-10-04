@@ -538,10 +538,8 @@ function AgentDashboard({ refreshTrigger, searchNumber, editCallId }) {
 
       <div className="agent-welcome">
         <h1>
-          {greeting}, {userName}!
+          {greeting}, {userName} &nbsp;!!&ensp;Here's your call performance for today.
         </h1>
-
-        <p>Here's your call performance for today.</p>
       </div>
 
       {/* =====================================================
