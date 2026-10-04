@@ -59,22 +59,12 @@ function FollowUps({ onEditFollowUp }) {
         </span>
       </div>
 
-      {loading && (
-        <div className="leads-message">
-          Loading follow ups...
-        </div>
-      )}
+      {loading && <div className="leads-message">Loading follow ups...</div>}
 
-      {error && (
-        <div className="leads-error">
-          {error}
-        </div>
-      )}
+      {error && <div className="leads-error">{error}</div>}
 
       {!loading && !error && followUps.length === 0 && (
-        <div className="leads-empty">
-          No follow up leads found.
-        </div>
+        <div className="leads-empty">No follow up leads found.</div>
       )}
 
       {!loading && !error && followUps.length > 0 && (
@@ -106,22 +96,16 @@ function FollowUps({ onEditFollowUp }) {
                   <td>{followUp.location || "-"}</td>
 
                   <td>
-                    <span className="lead-status">
-                      {followUp.status}
-                    </span>
+                    <span className="lead-status">{followUp.status}</span>
                   </td>
 
                   <td className="remarks-cell">
                     <div className="remarks-display">
-                      <span>
-                        {followUp.remarks || "-"}
-                      </span>
+                      <span>{followUp.remarks || "-"}</span>
 
                       <button
                         className="edit-remarks-btn"
-                        onClick={() =>
-                          onEditFollowUp(followUp.id)
-                        }
+                        onClick={() => onEditFollowUp(followUp.id)}
                         title="Edit follow up"
                       >
                         ✏️
@@ -131,9 +115,14 @@ function FollowUps({ onEditFollowUp }) {
 
                   <td>
                     {followUp.created_at
-                      ? new Date(
-                          followUp.created_at
-                        ).toLocaleDateString()
+                      ? new Date(followUp.created_at).toLocaleDateString(
+                          "en-GB",
+                          {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          },
+                        )
                       : "-"}
                   </td>
                 </tr>

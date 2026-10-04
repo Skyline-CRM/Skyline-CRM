@@ -8,6 +8,7 @@ function AgentDashboard({ refreshTrigger, searchNumber, editCallId }) {
   const [stats, setStats] = useState({
     total: 0,
     interested: 0,
+    followUp: 0,
     notInterested: 0,
     wrongNumber: 0,
     notPicked: 0,
@@ -21,84 +22,68 @@ function AgentDashboard({ refreshTrigger, searchNumber, editCallId }) {
   // Temporary status selection
   const [selectedStatus, setSelectedStatus] = useState({});
 
-  // Temporary Interested fields
-  const [interestedData, setInterestedData] = useState({});
-
   const currentCall = calls[currentCallIndex];
 
   // =========================================================
-// SEARCH CONTACT NUMBER
-// =========================================================
+  // SEARCH CONTACT NUMBER
+  // =========================================================
 
-const searchContact = async (number) => {
-  if (!number) return;
+  const searchContact = async (number) => {
+    if (!number) return;
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const { data, error } = await supabase
-      .from("calls")
-      .select(
-        `
+      const { data, error } = await supabase
+        .from("calls")
+        .select(
+          `
         id,
         customer_name,
         contact_no,
         email,
         location,
         status,
-        remarks,
-        budget,
-        preferred_location,
-        preference
+        remarks
         `,
-      )
-      .eq("contact_no", number)
-      .eq("agent_id", user.id)
-      .limit(1)
-      .maybeSingle();
+        )
+        .eq("contact_no", number)
+        .eq("agent_id", user.id)
+        .limit(1)
+        .maybeSingle();
 
-    if (error) {
-      console.error("Search error:", error);
-      alert("Unable to search this contact.");
-      return;
+      if (error) {
+        console.error("Search error:", error);
+        alert("Unable to search this contact.");
+        return;
+      }
+
+      if (!data) {
+        alert("No lead found with this contact number.");
+        return;
+      }
+
+      setCalls([data]);
+      setCurrentCallIndex(0);
+
+      setSelectedStatus({
+        [data.id]: data.status || "",
+      });
+    } catch (error) {
+      console.error("Unexpected search error:", error);
+      alert("Something went wrong while searching.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (!data) {
-      alert("No lead found with this contact number.");
-      return;
-    }
+  const loadCallForEdit = async (callId) => {
+    try {
+      setLoading(true);
 
-    setCalls([data]);
-    setCurrentCallIndex(0);
-
-    setSelectedStatus({
-      [data.id]: data.status || "",
-    });
-
-    setInterestedData({
-      [data.id]: {
-        budget: data.budget || "",
-        preferred_location: data.preferred_location || "",
-        preference: data.preference || "",
-      },
-    });
-
-  } catch (error) {
-    console.error("Unexpected search error:", error);
-    alert("Something went wrong while searching.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-const loadCallForEdit = async (callId) => {
-  try {
-    setLoading(true);
-
-    const { data, error } = await supabase
-      .from("calls")
-      .select(`
+      const { data, error } = await supabase
+        .from("calls")
+        .select(`
         id,
         customer_name,
         contact_no,
@@ -106,46 +91,35 @@ const loadCallForEdit = async (callId) => {
         location,
         status,
         remarks,
-        budget,
-        preferred_location,
-        preference,
         agent_id,
         created_at
       `)
-      .eq("id", callId)
-      .eq("agent_id", user.id)
-      .maybeSingle();
+        .eq("id", callId)
+        .eq("agent_id", user.id)
+        .maybeSingle();
 
-    if (error) {
-      console.error("Error loading lead:", error);
-      return;
+      if (error) {
+        console.error("Error loading lead:", error);
+        return;
+      }
+
+      if (!data) {
+        alert("This lead could not be found.");
+        return;
+      }
+
+      setCalls([data]);
+      setCurrentCallIndex(0);
+
+      setSelectedStatus({
+        [data.id]: data.status || "",
+      });
+    } catch (error) {
+      console.error("Error loading follow up:", error);
+    } finally {
+      setLoading(false);
     }
-
-    if (!data) {
-      alert("This lead could not be found.");
-      return;
-    }
-
-    setCalls([data]);
-    setCurrentCallIndex(0);
-
-    setSelectedStatus({
-      [data.id]: data.status || "",
-    });
-
-    setInterestedData({
-      [data.id]: {
-        budget: data.budget || "",
-        preferred_location: data.preferred_location || "",
-        preference: data.preference || "",
-      },
-    });
-  } catch (error) {
-    console.error("Error loading follow up:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   // =========================================================
   // GET LOGGED-IN USER
@@ -205,21 +179,21 @@ const loadCallForEdit = async (callId) => {
   // =========================================================
 
   useEffect(() => {
-  if (!user) return;
+    if (!user) return;
 
-  if (editCallId) {
-    loadCallForEdit(editCallId);
-    return;
-  }
+    if (editCallId) {
+      loadCallForEdit(editCallId);
+      return;
+    }
 
-  if (searchNumber) {
-    searchContact(searchNumber);
-    return;
-  }
+    if (searchNumber) {
+      searchContact(searchNumber);
+      return;
+    }
 
-  fetchAgentCalls();
-  fetchTodayStats();
-}, [user, refreshTrigger, searchNumber, editCallId]);
+    fetchAgentCalls();
+    fetchTodayStats();
+  }, [user, refreshTrigger, searchNumber, editCallId]);
 
   // =========================================================
   // FETCH TODAY'S COMPLETED CALLS
@@ -233,77 +207,80 @@ const loadCallForEdit = async (callId) => {
   // created_at is updated whenever the agent saves a call.
   // =========================================================
 
- const fetchTodayStats = async () => {
-  if (!user) return;
+  const fetchTodayStats = async () => {
+    if (!user) return;
 
-  try {
-    console.log(
-      "Fetching today's stats for agent:",
-      user.id
-    );
+    try {
+      console.log(
+        "Fetching today's stats for agent:",
+        user.id
+      );
 
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
 
-    const startOfTomorrow = new Date(startOfDay);
-    startOfTomorrow.setDate(
-      startOfTomorrow.getDate() + 1
-    );
+      const startOfTomorrow = new Date(startOfDay);
+      startOfTomorrow.setDate(
+        startOfTomorrow.getDate() + 1
+      );
 
-    const startISO = startOfDay.toISOString();
-    const endISO = startOfTomorrow.toISOString();
+      const startISO = startOfDay.toISOString();
+      const endISO = startOfTomorrow.toISOString();
 
-    const { data, error } = await supabase
-      .from("calls")
-      .select("id, status, created_at")
-      .eq("agent_id", user.id)
-      .not("status", "is", null)
-      .gte("created_at", startISO)
-      .lt("created_at", endISO);
+      const { data, error } = await supabase
+        .from("calls")
+        .select("id, status, created_at")
+        .eq("agent_id", user.id)
+        .not("status", "is", null)
+        .gte("created_at", startISO)
+        .lt("created_at", endISO);
 
-    if (error) {
+      if (error) {
+        console.error(
+          "Error fetching today's stats:",
+          error
+        );
+        return;
+      }
+
+      const completedToday = (data || []).filter(
+        (call) =>
+          call.status &&
+          call.status.trim() !== ""
+      );
+
+      const newStats = {
+        total: completedToday.length,
+
+        interested: completedToday.filter(
+          (call) => call.status === "Interested"
+        ).length,
+
+        followUp: completedToday.filter(
+          (call) => call.status === "Follow up"
+        ).length,
+
+        notInterested: completedToday.filter(
+          (call) => call.status === "Not Interested"
+        ).length,
+
+        wrongNumber: completedToday.filter(
+          (call) => call.status === "Wrong Number"
+        ).length,
+
+        notPicked: completedToday.filter(
+          (call) => call.status === "Not Picked"
+        ).length,
+      };
+
+      setStats(newStats);
+    } catch (error) {
       console.error(
-        "Error fetching today's stats:",
+        "Unexpected stats error:",
         error
       );
-      return;
     }
-
-    const completedToday = (data || []).filter(
-      (call) =>
-        call.status &&
-        call.status.trim() !== ""
-    );
-
-    const newStats = {
-      total: completedToday.length,
-
-      interested: completedToday.filter(
-        (call) => call.status === "Interested"
-      ).length,
-
-      notInterested: completedToday.filter(
-        (call) => call.status === "Not Interested"
-      ).length,
-
-      wrongNumber: completedToday.filter(
-        (call) => call.status === "Wrong Number"
-      ).length,
-
-      notPicked: completedToday.filter(
-        (call) => call.status === "Not Picked"
-      ).length,
-    };
-
-    setStats(newStats);
-
-  } catch (error) {
-    console.error(
-      "Unexpected stats error:",
-      error
-    );
-  }
-};
+  };
 
   // =========================================================
   // FETCH ASSIGNED CALLS
@@ -331,9 +308,6 @@ const loadCallForEdit = async (callId) => {
           location,
           status,
           remarks,
-          budget,
-          preferred_location,
-          preference,
           agent_id,
           created_at
         `
@@ -417,39 +391,6 @@ const loadCallForEdit = async (callId) => {
       ...prev,
       [callId]: status,
     }));
-
-    // If agent changes away from Interested,
-    // remove temporary Interested data.
-    if (status !== "Interested") {
-      setInterestedData((prev) => {
-        const updated = {
-          ...prev,
-        };
-
-        delete updated[callId];
-
-        return updated;
-      });
-    }
-  };
-
-  // =========================================================
-  // HANDLE INTERESTED FIELD CHANGE
-  // =========================================================
-
-  const handleInterestedFieldChange = (
-    callId,
-    field,
-    value
-  ) => {
-    setInterestedData((prev) => ({
-      ...prev,
-
-      [callId]: {
-        ...prev[callId],
-        [field]: value,
-      },
-    }));
   };
 
   // =========================================================
@@ -493,111 +434,23 @@ const loadCallForEdit = async (callId) => {
       return;
     }
 
-    // =====================================================
-    // INTERESTED VALIDATION
-    // =====================================================
-
-    const interested =
-      interestedData[callId] || {};
-
-    if (status === "Interested") {
-      if (!interested.budget?.trim()) {
-        alert(
-          "Please enter budget."
-        );
-
-        return;
-      }
-
-      if (
-        !interested.preferred_location?.trim()
-      ) {
-        alert(
-          "Please enter preferred location."
-        );
-
-        return;
-      }
-
-      if (
-        !interested.preference?.trim()
-      ) {
-        alert(
-          "Please enter preference."
-        );
-
-        return;
-      }
-    }
-
     try {
       setSavingCall(true);
 
-      // ===================================================
-      // UPDATE DATA
-      //
-      // IMPORTANT:
-      //
-      // We intentionally update created_at whenever the
-      // agent saves the call.
-      //
-      // This makes created_at represent the latest
-      // status-update/completion time.
-      // ===================================================
-
       const updateData = {
         email: call.email || null,
-
-        location:
-          call.location || null,
-
-        remarks:
-          call.remarks || null,
-
+        location: call.location || null,
+        remarks: call.remarks || null,
         status: status,
-
-        created_at:
-          new Date().toISOString(),
+        created_at: new Date().toISOString(),
       };
 
-      // ===================================================
-      // INTERESTED DATA
-      // ===================================================
-
-      if (status === "Interested") {
-        updateData.budget =
-          interested.budget?.trim() ||
-          null;
-
-        updateData.preferred_location =
-          interested.preferred_location?.trim() ||
-          null;
-
-        updateData.preference =
-          interested.preference?.trim() ||
-          null;
-      } else {
-        // Clear Interested-only fields
-        updateData.budget = null;
-
-        updateData.preferred_location =
-          null;
-
-        updateData.preference =
-          null;
-      }
-
-      // ===================================================
-      // UPDATE SUPABASE
-      // ===================================================
-
-      const { data, error } =
-        await supabase
-          .from("calls")
-          .update(updateData)
-          .eq("id", callId)
-          .eq("agent_id", user.id)
-          .select();
+      const { data, error } = await supabase
+        .from("calls")
+        .update(updateData)
+        .eq("id", callId)
+        .eq("agent_id", user.id)
+        .select();
 
       if (error) {
         console.error(
@@ -614,19 +467,11 @@ const loadCallForEdit = async (callId) => {
         return;
       }
 
-      // ===================================================
-      // REMOVE COMPLETED CALL FROM LOCAL STATE
-      // ===================================================
-
       setCalls((prevCalls) =>
         prevCalls.filter(
           (item) => item.id !== callId
         )
       );
-
-      // ===================================================
-      // CLEAR SELECTED STATUS
-      // ===================================================
 
       setSelectedStatus((prev) => {
         const updated = {
@@ -638,51 +483,18 @@ const loadCallForEdit = async (callId) => {
         return updated;
       });
 
-      // ===================================================
-      // CLEAR INTERESTED DATA
-      // ===================================================
-
-      setInterestedData((prev) => {
-        const updated = {
-          ...prev,
-        };
-
-        delete updated[callId];
-
-        return updated;
-      });
-
-      // ===================================================
-      // RESET CALL INDEX
-      // ===================================================
-
       setCurrentCallIndex(0);
 
-      // ===================================================
-      // REFRESH ASSIGNED CALLS
-      // ===================================================
-
       await fetchAgentCalls();
-
-      // ===================================================
-      // REFRESH TOP STATS
-      //
-      // THIS IS IMPORTANT.
-      //
-      // Without this, the top counters would remain
-      // unchanged until another dashboard refresh.
-      // ===================================================
-
       await fetchTodayStats();
-
     } catch (error) {
       console.error(
-        "Unexpected save error:",
+        "Unexpected error saving call:",
         error
       );
 
       alert(
-        "Something went wrong while saving the call."
+        "Failed to save call. Please try again."
       );
     } finally {
       setSavingCall(false);
@@ -700,7 +512,7 @@ const loadCallForEdit = async (callId) => {
 
   if (currentHour < 12) {
     greeting = "Good Morning";
-  } else if (currentHour < 14) {
+  } else if (currentHour < 15) {
     greeting = "Good Afternoon";
   } else {
     greeting = "Good Evening";
@@ -749,6 +561,11 @@ const loadCallForEdit = async (callId) => {
         </div>
 
         <div className="stat-card">
+          <h3>{stats.followUp}</h3>
+          <p>Follow Up</p>
+        </div>
+
+        <div className="stat-card">
           <h3>{stats.notInterested}</h3>
 
           <p>Not Interested</p>
@@ -773,19 +590,15 @@ const loadCallForEdit = async (callId) => {
 
       <div className="assigned-leads">
         <div className="assigned-leads-header">
+          <h2>My Assigned Calls</h2>
 
-          <h2>
-            My Assigned Calls
-          </h2>
-
-          <span>
-            {calls.length} Calls
-          </span>
-
+          <span>{calls.length} Calls</span>
         </div>
 
         {calls.length === 0 ? (
-          <div className="no-leads">All calls completed. Data finished!</div>
+          <div className="no-leads">
+            All calls completed. Data finished!
+          </div>
         ) : (
           <div className="lead-list">
             {currentCall ? (
@@ -873,101 +686,42 @@ const loadCallForEdit = async (callId) => {
                   <label>Call Status</label>
 
                   <select
-                    value={selectedStatus[currentCall.id] || ""}
+                    value={
+                      selectedStatus[currentCall.id] || ""
+                    }
                     onChange={(e) =>
-                      handleStatusChange(currentCall.id, e.target.value)
+                      handleStatusChange(
+                        currentCall.id,
+                        e.target.value
+                      )
                     }
                     disabled={savingCall}
                   >
-                    <option value="">Select Status</option>
-                    <option value="Interested">Interested</option>
-                    <option value="Follow up">Follow up</option>
-                    <option value="Not Interested">Not Interested</option>
+                    <option value="">
+                      Select Status
+                    </option>
 
-                    <option value="Wrong Number">Wrong Number</option>
+                    <option value="Interested">
+                      Interested
+                    </option>
 
-                    <option value="Not Picked">Not Picked</option>
+                    <option value="Follow up">
+                      Follow up
+                    </option>
+
+                    <option value="Not Interested">
+                      Not Interested
+                    </option>
+
+                    <option value="Wrong Number">
+                      Wrong Number
+                    </option>
+
+                    <option value="Not Picked">
+                      Not Picked
+                    </option>
                   </select>
                 </div>
-
-                {/* =================================================
-                    INTERESTED SECTION
-                ================================================= */}
-
-                {selectedStatus[currentCall.id] === "Interested" && (
-                  <div className="interested-panel">
-                    <div className="interested-title">
-                      ✨ Lead is Interested
-                    </div>
-
-                    <div className="interested-fields">
-                      {/* BUDGET */}
-
-                      <div>
-                        <label>Budget</label>
-
-                        <input
-                          type="text"
-                          placeholder="Enter budget"
-                          value={interestedData[currentCall.id]?.budget || ""}
-                          onChange={(e) =>
-                            handleInterestedFieldChange(
-                              currentCall.id,
-                              "budget",
-                              e.target.value,
-                            )
-                          }
-                          disabled={savingCall}
-                        />
-                      </div>
-
-                      {/* PREFERRED LOCATION */}
-
-                      <div>
-                        <label>Preferred Location</label>
-
-                        <input
-                          type="text"
-                          placeholder="Enter location"
-                          value={
-                            interestedData[currentCall.id]
-                              ?.preferred_location || ""
-                          }
-                          onChange={(e) =>
-                            handleInterestedFieldChange(
-                              currentCall.id,
-                              "preferred_location",
-                              e.target.value,
-                            )
-                          }
-                          disabled={savingCall}
-                        />
-                      </div>
-
-                      {/* PREFERENCE */}
-
-                      <div>
-                        <label>Preference</label>
-
-                        <input
-                          type="text"
-                          placeholder="2 BHK / Villa / Plot"
-                          value={
-                            interestedData[currentCall.id]?.preference || ""
-                          }
-                          onChange={(e) =>
-                            handleInterestedFieldChange(
-                              currentCall.id,
-                              "preference",
-                              e.target.value,
-                            )
-                          }
-                          disabled={savingCall}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 {/* =================================================
                     SAVE BUTTON
@@ -976,10 +730,14 @@ const loadCallForEdit = async (callId) => {
                 <button
                   type="button"
                   className="save-interested-btn"
-                  onClick={() => saveCall(currentCall.id)}
+                  onClick={() =>
+                    saveCall(currentCall.id)
+                  }
                   disabled={savingCall}
                 >
-                  {savingCall ? "Saving..." : "✨ Save & Next Call"}
+                  {savingCall
+                    ? "Saving..."
+                    : "✨ Save & Next Call"}
                 </button>
               </div>
             ) : (
